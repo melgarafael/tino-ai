@@ -174,34 +174,42 @@ async function discoverFixtureSources(fixtureDir) {
   return out;
 }
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
+// runFetchAll: executa a logica de fetch-all a partir de um objeto de opcoes.
+// Retorna { summary } sem escrever em stdout nem encerrar o processo.
+// Opcoes aceitas: { config, out, fixtureDir, limit, since, force, sourcesOverride }
+// - sourcesOverride: array ja resolvido de fontes; se presente, skipa loadConfig.
+async function runFetchAll(opts = {}) {
+  const outDir = opts.out ?? path.join(PROJECT_ROOT, '.tino-cache', 'raw', todayStamp());
+  const since = opts.since ?? sinceDefault();
+  const limit = Number.isFinite(opts.limit) && opts.limit > 0 ? opts.limit : 20;
 
-  const outDir = args.out ?? path.join(PROJECT_ROOT, '.tino-cache', 'raw', todayStamp());
-  const since = args.since ?? sinceDefault();
-  const limit = Number.isFinite(args.limit) && args.limit > 0 ? args.limit : 20;
-
-  // Em modo fixture sem --config explicito: auto-descobre os XMLs do dir.
   let sources;
-  if (args.fixtureDir && !args.config) {
-    sources = await discoverFixtureSources(args.fixtureDir);
+  if (Array.isArray(opts.sourcesOverride)) {
+    sources = opts.sourcesOverride;
+  } else if (opts.fixtureDir && !opts.config) {
+    sources = await discoverFixtureSources(opts.fixtureDir);
   } else {
-    const configPath = args.config ?? path.join(PROJECT_ROOT, 'config/sources.default.yaml');
+    const configPath = opts.config ?? path.join(PROJECT_ROOT, 'config/sources.default.yaml');
     sources = await loadConfig(configPath);
   }
   if (sources.length === 0) {
-    process.stdout.write(JSON.stringify({ fontes: 0, items_total: 0, items_por_fonte: {}, erros: [{ reason: 'no sources in config', configPath }] }, null, 2) + '\n');
-    process.exit(1);
+    return {
+      summary: {
+        fontes: 0,
+        items_total: 0,
+        items_por_fonte: {},
+        erros: [{ reason: 'no sources in config', configPath: opts.config ?? null }],
+        out: outDir,
+      },
+    };
   }
 
   await ensureDir(outDir);
 
-  // Em modo fixture, so processa fontes cujo arquivo <id>.xml existe.
-  // Em modo real, so fontes com active=true e type rss/atom.
   const targets = [];
   for (const s of sources) {
-    if (args.fixtureDir) {
-      const p = path.resolve(args.fixtureDir, `${s.id}.xml`);
+    if (opts.fixtureDir) {
+      const p = path.resolve(opts.fixtureDir, `${s.id}.xml`);
       if (await pathExists(p)) targets.push(s);
     } else {
       if (s.active === false) continue;
@@ -217,11 +225,11 @@ async function main() {
   for (const s of targets) {
     try {
       const { count, skipped, file } = await processSource(s, {
-        fixtureDir: args.fixtureDir,
+        fixtureDir: opts.fixtureDir,
         limit,
         since,
         outDir,
-        force: args.force,
+        force: opts.force,
       });
       itemsPorFonte[s.id] = count;
       itemsTotal += count;
@@ -243,7 +251,21 @@ async function main() {
     erros,
     out: outDir,
   };
+  return { summary };
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  const { summary } = await runFetchAll({
+    config: args.config,
+    out: args.out,
+    fixtureDir: args.fixtureDir,
+    limit: args.limit,
+    since: args.since,
+    force: args.force,
+  });
   process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
+  if (summary.fontes === 0) process.exit(1);
   process.exit(0);
 }
 
@@ -255,4 +277,4 @@ if (isMain) {
   });
 }
 
-export { main, parseArgs, inferTipo, filterAndLimit };
+export { main, parseArgs, inferTipo, filterAndLimit, runFetchAll };

@@ -404,8 +404,12 @@ async function main() {
   await ensureDir(novidadesDir);
   await ensureDir(favoritosDir);
   if (!(await pathExists(configPath))) {
-    const cfgMeta = { versao: 1, criado: new Date().toISOString().slice(0, 10) };
-    const cfgBody = '# Config do Tino\n\nEste arquivo guarda configuracoes do Tino neste vault.\n';
+    const cfgMeta = {
+      versao: 1,
+      criado: new Date().toISOString().slice(0, 10),
+      refreshes_desde_ultimo_profile_sync: 0,
+    };
+    const cfgBody = '# Config do Tino\n\nEste arquivo guarda configuracoes do Tino neste vault.\n\n## Fontes\n\n_(vazio — usa `config/sources.default.yaml` do repo)_\n';
     await fs.writeFile(configPath, serialize(cfgMeta, cfgBody), 'utf8');
   }
 
