@@ -6,6 +6,8 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:e2e",
     "serve": "python3 -m http.server 5173"
   },
   "dependencies": {
@@ -14,5 +16,8 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
   }
 }

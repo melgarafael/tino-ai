@@ -3,3 +3,5 @@ node_modules/
 .tino-cache/
 .DS_Store
 *.log
+test-results/
+playwright-report/
