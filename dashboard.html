@@ -392,9 +392,35 @@ async function connectVaultHandle(handle) {
   state.mode = 'connected';
 
   try { await idbPut('vaultHandle', handle); } catch (e) { console.warn('não foi possível salvar handle', e); }
+
+  // Conta .md do vault inteiro em paralelo (evidência visual de que lemos o vault inteiro)
+  scanVaultStats(handle).then(stats => { state.vaultStats = stats; render(); }).catch(() => {});
+
   await loadFromVault();
   hideBanner();
   render();
+}
+
+/* Conta .md recursivo do vault inteiro — só pra estatística, sem ler conteúdo.
+   Respeita limite pra não travar navegador em vault enorme. */
+async function scanVaultStats(handle, { maxDepth = 8, maxFiles = 5000 } = {}) {
+  const stats = { mdFiles: 0, dirs: 0, aborted: false, sample: [] };
+  async function walk(dir, depth, prefix) {
+    if (stats.aborted || depth > maxDepth) return;
+    for await (const [name, h] of dir.entries()) {
+      if (stats.mdFiles >= maxFiles) { stats.aborted = true; return; }
+      if (h.kind === 'directory') {
+        if (name.startsWith('.') || name === 'Tino' || name === 'tino' || name === 'node_modules') continue;
+        stats.dirs += 1;
+        await walk(h, depth + 1, prefix + name + '/');
+      } else if (name.endsWith('.md')) {
+        stats.mdFiles += 1;
+        if (stats.sample.length < 5) stats.sample.push(prefix + name);
+      }
+    }
+  }
+  try { await walk(handle, 0, ''); } catch {}
+  return stats;
 }
 
 async function seedVault(tinoDir) {
@@ -825,45 +851,89 @@ function renderToday() {
   if (total === 0) {
     const isConnected = state.mode === 'connected';
     const d = state.diag || {};
-    const children = [
-      el('h2', { text: isConnected ? 'Vault conectado, mas sem novidades carregadas' : 'Nenhuma novidade ainda' }),
-    ];
+    const vs = state.vaultStats;
+    const children = [];
+
     if (isConnected) {
-      children.push(el('p', { text: `Vault: ${d.vaultName || state.vaultName || '—'}` }));
-      const checks = el('ul', { style: 'text-align:left;max-width:480px;margin:16px auto;list-style:none;padding:0' });
-      const bullet = (label, ok, extra) => el('li', { style: 'padding:6px 0;color:' + (ok ? 'var(--high)' : 'var(--danger)') },
-        (ok ? '✓ ' : '✗ ') + label + (extra ? ' — ' + extra : ''));
-      checks.append(
-        bullet('pasta Tino/', true),
-        bullet('_perfil.md', d.perfilFound, d.perfilError || (d.perfilFound ? null : 'não encontrado')),
-        bullet('_config.md', d.configFound, d.configFound ? null : 'não encontrado'),
-        bullet('pasta novidades/', d.novidadesFound, d.novidadesError || (d.novidadesFound ? null : 'não existe')),
-        bullet(`arquivos .md em novidades/`, d.mdFiles > 0, `${d.mdFiles || 0} encontrados, ${d.parsed || 0} parseados ok`),
+      children.push(el('h2', { text: 'O pipeline ainda não foi rodado neste vault' }));
+
+      // Mostra que o vault INTEIRO é legível e conta os arquivos
+      const vaultInfo = el('p', { style: 'color:var(--text-dim)' });
+      vaultInfo.append(
+        'Vault conectado: ',
+        el('code', { class: 'cmd', text: state.vaultName || '—' })
       );
-      if (d.parseErrors && d.parseErrors.length) {
-        const details = el('details', { style: 'max-width:480px;margin:12px auto;text-align:left' },
-          el('summary', { text: `${d.parseErrors.length} arquivo(s) com erro de parse` }),
+      children.push(vaultInfo);
+
+      if (vs) {
+        const stats = el('p', { style: 'color:var(--text-dim);font-size:14px;margin-top:8px' });
+        stats.append(
+          'Seu vault tem ',
+          el('strong', { style: 'color:var(--text)', text: String(vs.mdFiles) }),
+          ' arquivos .md em ',
+          el('strong', { style: 'color:var(--text)', text: String(vs.dirs) }),
+          ' pastas. ',
+          el('span', { style: 'color:var(--text-faint)', text: '(o refresh lê tudo isso como contexto)' })
         );
-        d.parseErrors.slice(0, 5).forEach(p => details.append(el('div', { style: 'font-size:12px;color:var(--text-faint);padding:4px 0', text: `${p.file} — ${p.error}` })));
-        children.push(details);
-      }
-      children.push(checks);
-      let hint;
-      if (!d.novidadesFound) {
-        hint = `A pasta novidades/ não existe dentro de Tino/. Rode o refresh no terminal:`;
-      } else if (d.mdFiles === 0) {
-        hint = `A pasta está vazia. Rode o refresh:`;
-      } else if (d.parsed === 0) {
-        hint = `Tem ${d.mdFiles} arquivos .md mas nenhum parseou. Verifique o frontmatter.`;
+        children.push(stats);
       } else {
-        hint = `Algo inesperado. Verifique o console do navegador.`;
+        children.push(el('p', { style: 'color:var(--text-faint);font-size:13px', text: 'escaneando vault…' }));
       }
-      children.push(el('p', { style: 'margin-top:20px', text: hint }));
-      children.push(el('div', { class: 'cmd', style: 'display:inline-block;font-size:12px;padding:10px 16px', text: `node scripts/refresh.mjs --vault "<path-do-seu-vault>" --mock --force` }));
-      children.push(el('p', { style: 'margin-top:24px' },
+
+      // Explicação do dataflow
+      const explain = el('div', { style: 'max-width:560px;margin:24px auto;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:4px;text-align:left;color:var(--text-dim);font-size:13px;line-height:1.7' });
+      explain.append(
+        el('div', { style: 'color:var(--accent);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px', text: 'Como o Tino usa teu vault' }),
+        el('div', null,
+          el('strong', { style: 'color:var(--text)', text: 'setup' }),
+          ' lê o vault inteiro → escreve ',
+          el('code', { class: 'cmd', text: 'Tino/_perfil.md' })
+        ),
+        el('div', null,
+          el('strong', { style: 'color:var(--text)', text: 'refresh' }),
+          ' lê fontes + perfil → escreve ',
+          el('code', { class: 'cmd', text: 'Tino/novidades/*.md' })
+        ),
+        el('div', null,
+          el('strong', { style: 'color:var(--text)', text: 'dashboard' }),
+          ' lê ',
+          el('code', { class: 'cmd', text: 'Tino/novidades/' }),
+          ' (é só visor)'
+        ),
+      );
+      children.push(explain);
+
+      // Comando exato pré-preenchido com o vault name
+      const vaultPath = state.vaultName || 'vault';
+      const cmdLine = `tino refresh --vault "<caminho-do-seu-vault>" --mock --force`;
+      children.push(el('p', { style: 'margin-top:24px', text: 'Rode no terminal (de qualquer pasta):' }));
+      const cmdBox = el('div', { class: 'cmd', style: 'display:inline-block;font-size:13px;padding:10px 16px;user-select:all' }, cmdLine);
+      children.push(cmdBox);
+      children.push(el('p', { style: 'margin-top:8px;font-size:12px;color:var(--text-faint)', text: `Substitua <caminho-do-seu-vault> pelo path absoluto (ex: /Users/$USER/Documents/${vaultPath}). Escape espaços com aspas.` }));
+
+      // Diagnóstico técnico colapsável
+      if (d.mdFiles !== undefined) {
+        const techDetails = el('details', { style: 'max-width:560px;margin:24px auto;text-align:left;font-size:12px' },
+          el('summary', { style: 'color:var(--text-dim);cursor:pointer', text: 'Diagnóstico técnico' }),
+        );
+        const techPre = el('pre', { style: 'margin-top:8px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:11px;color:var(--text-dim)' });
+        techPre.textContent = JSON.stringify({
+          perfilFound: d.perfilFound,
+          configFound: d.configFound,
+          novidadesFound: d.novidadesFound,
+          mdFilesEmNovidades: d.mdFiles,
+          parsed: d.parsed,
+          parseErrors: d.parseErrors,
+        }, null, 2);
+        techDetails.append(techPre);
+        children.push(techDetails);
+      }
+
+      children.push(el('p', { style: 'margin-top:32px' },
         el('button', { class: 'cta', onclick: disconnectVault, text: 'Voltar ao modo demo' })
       ));
     } else {
+      children.push(el('h2', { text: 'Nenhuma novidade ainda' }));
       children.push(el('p', { text: 'Rode o comando de refresh do seu Claude Code para que o Tino processe as fontes e popule esta visualização.' }));
       children.push(el('div', { class: 'cmd', style: 'display:inline-block;font-size:13px;padding:10px 16px', text: '/tino:refresh' }));
     }
