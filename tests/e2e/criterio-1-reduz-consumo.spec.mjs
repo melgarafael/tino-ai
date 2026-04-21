@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('criterio 1 · reduz consumo', () => {
   test('secao Focar tem no maximo 5 cards e calm copy aparece', async ({ page }) => {
-    await page.goto('/dashboard.html');
+    await page.goto('/dashboard.html?mock=1');
 
     // Espera a view "Hoje" estar ativa e renderizada
     const todayView = page.locator('#today.view.active');

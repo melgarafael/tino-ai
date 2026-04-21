@@ -1081,6 +1081,7 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
    Se ausente ou inválido, cai no MOCK embutido. */
 async function tryLoadDemoData() {
   try {
+    if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('mock')) return false;
     const res = await fetch('./dashboard-data.json', { cache: 'no-store' });
     if (!res.ok) return false;
     const payload = await res.json();

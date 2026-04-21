@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('criterio 4 · justificativa personalizada', () => {
   test('expandir card revela reason com label e cite', async ({ page }) => {
-    await page.goto('/dashboard.html');
+    await page.goto('/dashboard.html?mock=1');
 
     const todayView = page.locator('#today.view.active');
     await expect(todayView).toBeVisible();

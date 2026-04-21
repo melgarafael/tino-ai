@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('criterio 3 · cobertura', () => {
   test('pelo menos 8 cards renderizados no total', async ({ page }) => {
-    await page.goto('/dashboard.html');
+    await page.goto('/dashboard.html?mock=1');
 
     const todayView = page.locator('#today.view.active');
     await expect(todayView).toBeVisible();

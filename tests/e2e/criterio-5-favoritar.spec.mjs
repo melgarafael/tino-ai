@@ -12,7 +12,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('criterio 5 · favoritar', () => {
   test('click em Favoritar marca como Favoritado e aparece na aba', async ({ page }) => {
-    await page.goto('/dashboard.html');
+    await page.goto('/dashboard.html?mock=1');
 
     const todayView = page.locator('#today.view.active');
     await expect(todayView).toBeVisible();

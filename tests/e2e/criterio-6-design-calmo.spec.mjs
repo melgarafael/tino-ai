@@ -13,7 +13,7 @@ function parseRgb(str) {
 
 test.describe('criterio 6 · design calmo', () => {
   test('bg escuro, fonte Newsreader aplicada, zero animacao agressiva', async ({ page }) => {
-    await page.goto('/dashboard.html');
+    await page.goto('/dashboard.html?mock=1');
 
     // Aguarda render
     await expect(page.locator('#today.view.active .calm')).toBeVisible();

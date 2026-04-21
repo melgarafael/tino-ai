@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('criterio 2 · permissao de ignorar', () => {
   test('secao Ignorar por ora existe, tem cards e tag Ignore', async ({ page }) => {
-    await page.goto('/dashboard.html');
+    await page.goto('/dashboard.html?mock=1');
 
     const todayView = page.locator('#today.view.active');
     await expect(todayView).toBeVisible();
