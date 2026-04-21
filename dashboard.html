@@ -515,6 +515,149 @@ async function toggleFavorite(newsId) {
   render();
 }
 
+/* ---------------- Ajustes (thumbs up/down) ---------------- */
+const ADJ_FILE = '_ajustes.md';
+const SEC_CERTEIROS = 'Certeiros';
+const SEC_ERRADOS = 'Errados';
+const ADJ_SEP = ' — ';
+
+function todayStampLocal() {
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Parseia body em secoes { name, lines[] } preservando ordem.
+function parseAdjSections(body) {
+  const sections = [{ name: '', lines: [] }];
+  const lines = String(body || '').split(/\r?\n/);
+  for (const line of lines) {
+    const h = line.match(/^##\s+(.+?)\s*$/);
+    if (h) sections.push({ name: h[1].trim(), lines: [] });
+    else sections[sections.length - 1].lines.push(line);
+  }
+  return sections;
+}
+
+function serializeAdjSections(sections) {
+  const out = [];
+  for (const s of sections) {
+    if (s.name) out.push(`## ${s.name}`);
+    let lines = s.lines.slice();
+    while (lines.length && lines[lines.length - 1] === '') lines.pop();
+    out.push(...lines);
+    out.push('');
+  }
+  while (out.length && out[out.length - 1] === '') out.pop();
+  return out.join('\n');
+}
+
+function findAdjSection(sections, name) {
+  return sections.find(s => s.name.toLowerCase() === name.toLowerCase()) || null;
+}
+function ensureAdjSection(sections, name) {
+  let s = findAdjSection(sections, name);
+  if (!s) { s = { name, lines: [] }; sections.push(s); }
+  return s;
+}
+function parseAdjItemLine(line) {
+  const m = String(line).match(/^\s*[-*]\s+(\S+)\s+(?:—|-|--)\s+(.+?)\s*$/);
+  if (!m) return null;
+  return { id: m[1], titulo: m[2] };
+}
+function formatAdjItemLine(id, titulo) {
+  return `- ${id}${ADJ_SEP}${titulo || ''}`;
+}
+function removeItemFromAdjSection(section, id) {
+  if (!section) return false;
+  const before = section.lines.length;
+  section.lines = section.lines.filter(line => {
+    const it = parseAdjItemLine(line);
+    return !it || it.id !== id;
+  });
+  return section.lines.length !== before;
+}
+function upsertItemInAdjSection(section, id, titulo) {
+  let replaced = false;
+  section.lines = section.lines.map(line => {
+    const it = parseAdjItemLine(line);
+    if (it && it.id === id) { replaced = true; return formatAdjItemLine(id, titulo); }
+    return line;
+  });
+  if (!replaced) section.lines.push(formatAdjItemLine(id, titulo));
+  return !replaced;
+}
+
+async function recordAdjustment(newsId, titulo, sinal) {
+  // No-op em modo demo.
+  if (state.mode !== 'connected' || !state.tinoHandle) return;
+  if (sinal !== 'certeiro' && sinal !== 'errado') return;
+
+  let fh;
+  let currentText = '';
+  try {
+    fh = await state.tinoHandle.getFileHandle(ADJ_FILE, { create: true });
+    try {
+      const file = await fh.getFile();
+      currentText = await file.text();
+    } catch { currentText = ''; }
+  } catch (err) {
+    console.error('falha ao abrir _ajustes.md', err);
+    return;
+  }
+
+  const parsed = parseFrontmatter(currentText);
+  const meta = parsed.meta || {};
+  const body = parsed.body || '';
+  const sections = parseAdjSections(body);
+  const certeiros = ensureAdjSection(sections, SEC_CERTEIROS);
+  const errados = ensureAdjSection(sections, SEC_ERRADOS);
+
+  const sourceSec = sinal === 'certeiro' ? errados : certeiros;
+  const targetSec = sinal === 'certeiro' ? certeiros : errados;
+  const targetKey = sinal === 'certeiro' ? 'thumb_up' : 'thumb_down';
+  const oppositeKey = sinal === 'certeiro' ? 'thumb_down' : 'thumb_up';
+
+  const alreadyInTarget = targetSec.lines.some(line => {
+    const it = parseAdjItemLine(line);
+    return it && it.id === newsId;
+  });
+  const existedInSource = removeItemFromAdjSection(sourceSec, newsId);
+
+  upsertItemInAdjSection(targetSec, newsId, titulo || '');
+
+  const prevUp = Number.isFinite(Number(meta.thumb_up)) ? Number(meta.thumb_up) : 0;
+  const prevDown = Number.isFinite(Number(meta.thumb_down)) ? Number(meta.thumb_down) : 0;
+  const counters = { thumb_up: prevUp, thumb_down: prevDown };
+  if (!alreadyInTarget) {
+    counters[targetKey] += 1;
+    if (existedInSource) counters[oppositeKey] = Math.max(0, counters[oppositeKey] - 1);
+  }
+
+  if (!findAdjSection(sections, 'Tags a ignorar')) {
+    sections.push({ name: 'Tags a ignorar', lines: ['(edite `ignore_tags` no frontmatter — tags aqui sao penalizadas pelo ranker)'] });
+  }
+
+  const nextMeta = {
+    atualizado: todayStampLocal(),
+    thumb_up: counters.thumb_up,
+    thumb_down: counters.thumb_down,
+    ignore_tags: Array.isArray(meta.ignore_tags) ? meta.ignore_tags : []
+  };
+  const nextBody = serializeAdjSections(sections);
+  const text = serializeFrontmatter(nextMeta, nextBody) + '\n';
+
+  try {
+    const w = await fh.createWritable();
+    await w.write(text);
+    await w.close();
+  } catch (err) {
+    console.error('falha ao escrever _ajustes.md', err);
+  }
+}
+
 async function disconnectVault() {
   if (!confirm('Desconectar o vault? Você volta para o modo demo com dados de exemplo.')) return;
   try { await idbRemove('vaultHandle'); } catch {}
@@ -626,8 +769,8 @@ function card(n) {
 
     const actions = el('div', { class: 'expand-actions' },
       el('button', { class: 'act primary' + (n.favorito ? ' active' : ''), 'data-fav': n.id, text: n.favorito ? 'Favoritado' : 'Favoritar' }),
-      el('button', { class: 'act thumb up', 'data-thumb': 'up', 'data-id': n.id, text: 'Certeiro' }),
-      el('button', { class: 'act thumb down', 'data-thumb': 'down', 'data-id': n.id, text: 'Errou' }),
+      el('button', { class: 'act thumb up', 'data-thumb': 'up', 'data-id': n.id, 'data-titulo': n.titulo, text: 'Certeiro' }),
+      el('button', { class: 'act thumb down', 'data-thumb': 'down', 'data-id': n.id, 'data-titulo': n.titulo, text: 'Errou' }),
       isSafeUrl(n.url) ? el('a', { class: 'act', href: n.url, target: '_blank', rel: 'noopener', text: 'Abrir fonte' }) : null
     );
 
@@ -841,6 +984,12 @@ function wireCards() {
       const wasActive = btn.classList.contains('active');
       btn.parentElement.querySelectorAll('[data-thumb]').forEach(s => s.classList.remove('active'));
       if (!wasActive) btn.classList.add('active');
+      if (state.mode === 'connected' && !wasActive) {
+        const id = btn.getAttribute('data-id');
+        const titulo = btn.getAttribute('data-titulo') || '';
+        const sinal = btn.getAttribute('data-thumb') === 'up' ? 'certeiro' : 'errado';
+        recordAdjustment(id, titulo, sinal).catch(err => console.error('recordAdjustment falhou', err));
+      }
     });
   });
 }

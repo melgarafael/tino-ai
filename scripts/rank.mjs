@@ -25,6 +25,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parse, serialize } from '../lib/frontmatter.mjs';
 import { rankMock } from '../lib/rank-mock.mjs';
+import { readAdjustments } from '../lib/adjustments.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -76,9 +77,16 @@ async function readPerfil(filePath) {
 async function readAjustes(filePath) {
   if (!filePath) return [];
   try {
-    const text = await fs.readFile(filePath, 'utf8');
-    const { meta } = parse(text);
-    return [meta];
+    const data = await readAdjustments(filePath);
+    // Monta shape consumido pelo rank-mock:
+    //   { ignore_tags: [...], thumbs_down: [{ id, titulo }] }
+    const thumbsDown = (data.items || [])
+      .filter((it) => it && it.sinal === 'errado')
+      .map((it) => ({ id: it.id, titulo: it.titulo }));
+    return [{
+      ignore_tags: Array.isArray(data.meta.ignore_tags) ? data.meta.ignore_tags : [],
+      thumbs_down: thumbsDown,
+    }];
   } catch (e) {
     if (e && e.code === 'ENOENT') return [];
     throw e;

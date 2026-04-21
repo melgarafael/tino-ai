@@ -90,6 +90,21 @@ test('rank-mock: identidade match soma sem estourar cap', () => {
   assert.equal(r.veredito, 'Considera');
 });
 
+test('rank-mock: ajustes.thumbs_down penaliza novidade com tokens do titulo thumbed-down', () => {
+  // User deu thumbs-down em "Gemini 2.5 Flash ganha modo thinking".
+  // Novidade atual menciona "Gemini" e "Flash" — deve ser penalizada.
+  const novidade = {
+    titulo: 'Gemini Flash roadmap update',
+    resumo_bruto: 'Novo ciclo de releases da linha Flash.',
+    data: daysAgo(1),
+  };
+  const ajustes = [{ thumbs_down: [{ id: 'x', titulo: 'Gemini 2.5 Flash ganha modo thinking' }] }];
+  const semAjustes = rankMock(perfilBase, novidade);
+  const comAjustes = rankMock(perfilBase, novidade, ajustes);
+  assert.ok(comAjustes.nota < semAjustes.nota, `ajustes deviam reduzir a nota (sem=${semAjustes.nota}, com=${comAjustes.nota})`);
+  assert.match(comAjustes.justificativa, /thumbs_down/i);
+});
+
 test('rank-mock: ajustes.ignore_tags penaliza', () => {
   const novidade = {
     titulo: 'Claude Agent SDK 1.0 with crypto integration',
