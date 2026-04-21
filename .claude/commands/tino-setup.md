@@ -17,7 +17,7 @@ Se o usuario nao souber ou quiser so testar, use o fallback de demo: `tino-vault
 Execute via Bash:
 
 ```bash
-node scripts/setup.mjs --vault "$VAULT"
+tino setup --vault "$VAULT"
 ```
 
 Isso vai:

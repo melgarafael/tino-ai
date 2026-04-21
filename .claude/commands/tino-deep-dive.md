@@ -20,7 +20,7 @@ Aceite um argumento posicional com o id/slug (ex: `/tino:deep-dive anthropic-age
 Execute via Bash (mock para validar favorito sem custo):
 
 ```bash
-node scripts/deep-dive.mjs --vault "$VAULT" --id "$ID" --mock
+tino deep-dive --vault "$VAULT" --id "$ID" --mock
 ```
 
 - Se exit code != 0: a novidade nao existe OU nao tem `favorito: true`. Mostre o erro e pare.

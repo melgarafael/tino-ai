@@ -17,7 +17,7 @@ Fallback de demo: `tino-vault-sample/perfil-raw` (relativo ao repo Tino).
 Execute via Bash:
 
 ```bash
-node scripts/refresh.mjs --vault "$VAULT" --mock
+tino refresh --vault "$VAULT" --mock
 ```
 
 Isso vai:

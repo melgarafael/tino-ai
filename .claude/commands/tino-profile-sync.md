@@ -21,7 +21,7 @@ Espere confirmacao antes de prosseguir.
 Execute via Bash:
 
 ```bash
-node scripts/profile-sync.mjs --vault "$VAULT" --mock --dry-run
+tino profile-sync --vault "$VAULT" --mock --dry-run
 ```
 
 Isso imprime o diff (chips adicionados/removidos em identidade, foco_ativo, evita) sem escrever.
@@ -33,7 +33,7 @@ Mostre o diff ao usuario e pergunte: `Aplicar este diff?`.
 Se o usuario confirmou:
 
 ```bash
-node scripts/profile-sync.mjs --vault "$VAULT" --mock
+tino profile-sync --vault "$VAULT" --mock
 ```
 
 Interprete o summary JSON:

@@ -58,21 +58,38 @@ Não é obrigatório ter o Obsidian instalado. O Tino escreve markdown puro — 
 
 ## Instalação
 
-Três passos. Menos de dois minutos com conexão decente.
+Quatro passos. Menos de dois minutos.
 
 ```bash
-# 1. Clone o repo
+# 1. Clone o repo (pode ser em qualquer lugar)
 git clone https://github.com/rafaelmelgaco/tino-ai.git
 cd tino-ai
 
-# 2. Instale as dependências de Node (produção + dev)
+# 2. Deps do Node
 npm install
 
-# 3. Instale o Chromium usado pelos testes E2E
+# 3. Instala o Tino globalmente no seu Claude Code + PATH
+bash install.sh
+
+# 4. (opcional) Chromium para os testes E2E
 npx playwright install chromium
 ```
 
-O terceiro passo só é necessário se você quer rodar os testes E2E. Se o plano for só usar o Tino, pode pular.
+**O que o `install.sh` faz:**
+
+- Salva o caminho do repo em `~/.tino/config.sh` como `TINO_HOME`
+- Symlinka `bin/tino` → `~/.local/bin/tino` (CLI global)
+- Symlinka os 4 slash commands → `~/.claude/commands/tino-*.md` (funcionam em **qualquer projeto** do Claude Code, não só dentro do repo)
+- Symlinka os 3 agents → `~/.claude/agents/`
+- Tudo reversível via `uninstall.sh` — repo e vaults ficam intactos
+
+Depois disso, tanto o CLI `tino` quanto os `/tino:*` funcionam de **qualquer diretório**. Você pode apagar o repo da memória mental — só precisa saber do comando.
+
+**Requisitos de PATH:** se `~/.local/bin` ainda não está no teu `$PATH`, o install script avisa. Adicione ao seu shell rc:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
 
 Dependências instaladas:
 

@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# bin/tino — Tino CLI dispatcher
+# Chamado pelos slash commands do Claude Code e disponível globalmente após install.sh.
+set -euo pipefail
+
+# Resolve TINO_HOME (repo raiz) via symlink se preciso
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"; done
+TINO_HOME="${TINO_HOME:-$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)}"
+
+# Fallback: se ~/.tino/config.sh existir, usa ele
+if [ -f "$HOME/.tino/config.sh" ]; then
+  # shellcheck disable=SC1091
+  source "$HOME/.tino/config.sh"
+fi
+
+usage() {
+  cat <<EOF
+Tino CLI — curador local-first de novidades de IA
+
+Uso:
+  tino <subcommand> [args]
+
+Subcommands:
+  setup              Inicializa o Tino num vault (extrai perfil, cria Tino/)
+  refresh            Coleta fontes + rankeia + escreve novidades no vault
+  profile-sync       Regenera _perfil.md preservando contadores
+  deep-dive          Enriquece uma novidade favoritada
+  fetch-all          Só coleta fontes (passo isolado do pipeline)
+  rank               Só rankeia (passo isolado do pipeline)
+  dashboard:data     Gera dashboard-data.json a partir de um vault
+  dashboard:serve    Sobe HTTP server local servindo dashboard.html
+  dashboard:open     data + serve + abre no browser
+  home               Imprime o TINO_HOME resolvido
+  help               Esta mensagem
+
+Exemplos:
+  tino setup --vault ~/Obsidian/SegundoCerebro
+  tino refresh --vault ~/Obsidian/SegundoCerebro --mock --force
+  tino dashboard:open --vault ~/Obsidian/SegundoCerebro
+
+TINO_HOME atual: $TINO_HOME
+EOF
+}
+
+SUB="${1:-help}"; shift || true
+
+case "$SUB" in
+  setup)            exec node "$TINO_HOME/scripts/setup.mjs" "$@" ;;
+  refresh)          exec node "$TINO_HOME/scripts/refresh.mjs" "$@" ;;
+  rank)             exec node "$TINO_HOME/scripts/rank.mjs" "$@" ;;
+  fetch-all)        exec node "$TINO_HOME/scripts/fetch-all.mjs" "$@" ;;
+  profile-sync)     exec node "$TINO_HOME/scripts/profile-sync.mjs" "$@" ;;
+  deep-dive)        exec node "$TINO_HOME/scripts/deep-dive.mjs" "$@" ;;
+  dashboard:data)   exec node "$TINO_HOME/scripts/generate-dashboard-data.mjs" "$@" ;;
+  dashboard:serve)
+    cd "$TINO_HOME"
+    PORT="${TINO_PORT:-8080}"
+    echo "serving dashboard.html at http://127.0.0.1:$PORT/dashboard.html"
+    exec python3 -m http.server "$PORT" --bind 127.0.0.1
+    ;;
+  dashboard:open)
+    # Pega --vault dos args
+    VAULT=""
+    REMAINING=()
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --vault) VAULT="$2"; shift 2 ;;
+        *) REMAINING+=("$1"); shift ;;
+      esac
+    done
+    if [ -z "$VAULT" ]; then
+      echo "erro: --vault é obrigatório"; exit 2
+    fi
+    node "$TINO_HOME/scripts/generate-dashboard-data.mjs" --vault "$VAULT" --out "$TINO_HOME/dashboard-data.json" "${REMAINING[@]:-}"
+    PORT="${TINO_PORT:-8080}"
+    # Inicia server se porta livre
+    if ! lsof -iTCP:"$PORT" -sTCP:LISTEN -t >/dev/null 2>&1; then
+      (cd "$TINO_HOME" && python3 -m http.server "$PORT" --bind 127.0.0.1 >/tmp/tino-server.log 2>&1 &)
+      sleep 1
+    fi
+    URL="http://127.0.0.1:$PORT/dashboard.html"
+    if command -v open >/dev/null 2>&1; then open "$URL"
+    elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$URL"
+    else echo "abra manualmente: $URL"
+    fi
+    echo "dashboard: $URL"
+    ;;
+  home)             echo "$TINO_HOME" ;;
+  help|-h|--help|"") usage ;;
+  *)                echo "subcommand desconhecido: $SUB"; usage; exit 1 ;;
+esac

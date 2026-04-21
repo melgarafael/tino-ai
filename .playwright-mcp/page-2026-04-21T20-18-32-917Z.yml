@@ -1,0 +1,104 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - heading "Tino." [level=1] [ref=e5]
+      - generic [ref=e6]:
+        - generic [ref=e8]: modo demo
+        - generic [ref=e9]: ·
+        - button "Conectar vault" [ref=e10] [cursor=pointer]
+    - tablist [ref=e11]:
+      - button "Hoje 2" [ref=e12] [cursor=pointer]
+      - button "Favoritos 0" [ref=e13] [cursor=pointer]
+      - button "Perfil" [ref=e14] [cursor=pointer]
+      - button "Config" [ref=e15] [cursor=pointer]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - paragraph [ref=e19]:
+        - text: Você está em dia.
+        - strong [ref=e20]: 2 novidades
+        - text: merecem teu foco hoje de 5 analisadas. As demais podem ser ignoradas com tranquilidade.
+        - generic [ref=e21]: Tino lê seu vault Obsidian, monitora suas fontes configuradas e ranqueia o que é realmente relevante para o seu momento.
+      - generic [ref=e22]:
+        - heading "Focar hoje" [level=2] [ref=e23]:
+          - emphasis [ref=e24]: Focar
+          - text: hoje
+        - generic [ref=e25]: nota 9+ · altamente aplicável
+      - generic [ref=e26]:
+        - article [ref=e27] [cursor=pointer]:
+          - generic [ref=e28]:
+            - text: "9.0"
+            - generic [ref=e29]: nota
+          - generic [ref=e30]:
+            - heading "Claude Managed Agents GA" [level=3] [ref=e31]
+            - generic [ref=e32]:
+              - generic [ref=e33]: anthropic-sample
+              - generic [ref=e34]: ·
+              - generic [ref=e35]: news · 2026-04-21T09:00:00.000Z
+            - paragraph [ref=e36]:
+              - generic [ref=e37]: Foca
+              - text: Claude Managed Agents are now generally available. Build long-running agentic workflows with durable state and first-class tool use.
+            - text: ↳ ☆
+          - generic [ref=e38]:
+            - text: expandir
+            - generic [ref=e39]: ▾
+        - article [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]:
+            - text: "9.0"
+            - generic [ref=e42]: nota
+          - generic [ref=e43]:
+            - heading "Claude Agent SDK 1.0" [level=3] [ref=e44]
+            - generic [ref=e45]:
+              - generic [ref=e46]: anthropic-sample
+              - generic [ref=e47]: ·
+              - generic [ref=e48]: news · 2026-04-17T14:30:00.000Z
+            - paragraph [ref=e49]:
+              - generic [ref=e50]: Foca
+              - text: The Claude Agent SDK reaches 1.0 with stable APIs for tool orchestration, streaming, and cache-aware loops.
+            - text: ↳ ☆
+          - generic [ref=e51]:
+            - text: expandir
+            - generic [ref=e52]: ▾
+      - generic [ref=e53]:
+        - heading "Ignorar por ora" [level=2] [ref=e54]:
+          - emphasis [ref=e55]: Ignorar
+          - text: por ora
+        - generic [ref=e56]: nota < 7 · fora do seu contexto atual
+      - generic [ref=e57]:
+        - article [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: "6.0"
+          - generic [ref=e60]:
+            - heading "Valid item with title and link" [level=3] [ref=e61]
+            - paragraph [ref=e62]:
+              - generic [ref=e63]: Acompanha
+              - text: This one parses fine.
+            - text: ↳ ☆
+          - generic [ref=e64]:
+            - text: expandir
+            - generic [ref=e65]: ▾
+        - article [ref=e66] [cursor=pointer]:
+          - generic [ref=e67]: "6.0"
+          - generic [ref=e68]:
+            - heading "Notes on shipping an agent with Claude 4.7" [level=3] [ref=e69]
+            - paragraph [ref=e70]:
+              - generic [ref=e71]: Acompanha
+              - text: "Some practical notes on shipping a small Claude 4.7 agent to production: prompt caching, compaction, tool budgets."
+            - text: ↳ ☆
+          - generic [ref=e72]:
+            - text: expandir
+            - generic [ref=e73]: ▾
+        - article [ref=e74] [cursor=pointer]:
+          - generic [ref=e75]: "6.0"
+          - generic [ref=e76]:
+            - heading "Prompt caching explained visually" [level=3] [ref=e77]
+            - paragraph [ref=e78]:
+              - generic [ref=e79]: Acompanha
+              - text: A visual walkthrough of how Anthropic prompt caching composes with tool-call loops.
+            - text: ↳ ☆
+          - generic [ref=e80]:
+            - text: expandir
+            - generic [ref=e81]: ▾
+  - contentinfo [ref=e82]:
+    - generic [ref=e83]:
+      - text: Tino ·
+      - emphasis [ref=e84]: ter tino é ter discernimento
+    - generic [ref=e85]: Gerado localmente · nenhum dado sai da sua máquina
