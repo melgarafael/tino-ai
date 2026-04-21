@@ -348,8 +348,27 @@
     <li>Clip [0, 10], 1 casa decimal.</li>
   </ul>
 
-  <h3>Modo real (Claude)</h3>
-  <p>Dentro do Claude Code, o agent <code>ranker</code> usa o prompt canônico em <code>config/prompts/rank-novelty.md</code> pra ler perfil + item e produzir um JSON <code>{nota, veredito, resumo, justificativa, cite}</code>. A justificativa sempre cita um arquivo do vault que motivou a nota — auditável.</p>
+  <h3>Modo real (Claude) — <code>tino rank:claude</code></h3>
+  <p>Pra ter justificativas <strong>concretas</strong> em vez de formulaicas, use o ranker via Claude headless:</p>
+<pre><code><span class="cmt"># ranqueia todos os items do vault</span>
+<span class="cmd">tino rank:claude</span> --vault <span class="str">"$VAULT"</span>
+
+<span class="cmt"># só os items com nota >= 9 (mais barato/rápido)</span>
+<span class="cmd">tino rank:claude</span> --vault <span class="str">"$VAULT"</span> --only-foca
+
+<span class="cmt"># dry-run pra ver o resultado antes de reescrever</span>
+<span class="cmd">tino rank:claude</span> --vault <span class="str">"$VAULT"</span> --dry-run</code></pre>
+  <p>O script faz batch de 15 items por call via <code>claude -p</code> headless, usando o prompt canônico em <code>config/prompts/rank-novelty.md</code>. Cada novidade recebe:</p>
+  <ul>
+    <li><strong>Justificativa concreta</strong> que cita qual termo do <code>_perfil.md</code> ativou (foco_ativo, identidade, evita)</li>
+    <li><strong>Conexão explícita</strong> com um projeto/interesse do perfil — ex: "Managed Agents casa direto com a tese do Tino"</li>
+    <li><strong>Ação sugerida</strong> — "migrar código essa semana", "agendar leitura", "descartar"</li>
+    <li><strong>Zero boilerplate</strong> como "baseado em heurística"</li>
+  </ul>
+  <p>Cost aproximado: $0.02–$0.05 por batch de 15 items com cache quente. Em 70 items fica ~$0.20–$0.30 total.</p>
+  <div class="callout">
+    <strong>Fluxo recomendado.</strong> Rode <code>tino refresh --mock</code> rápido pra popular <code>novidades/</code>, depois <code>tino rank:claude</code> pra refinar as justificativas. Mock pra descobrir items; Claude pra decidir e explicar.
+  </div>
 </section>
 
 <section id="fontes">

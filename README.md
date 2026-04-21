@@ -322,11 +322,31 @@ Heurística pura em `lib/rank-mock.mjs`. Dado um item (título + resumo + tipo +
 
 É determinístico: mesmo perfil + mesmo item = mesma nota, sempre. Útil pra reproduzir bugs, pra auditar decisões, pra rodar offline.
 
-### Modo real (Claude)
+### Modo real (Claude) — `tino rank:claude`
 
-Mesmo contrato, mas o ranker é um subagent Claude (`ranker.md`) carregado pelo Claude Code. Recebe o perfil completo como contexto + cada item, e responde com nota + veredito + justificativa personalizada. Tende a ser mais sensível a nuance (ex: "paper de RL aplicado a robótica" não bate vocabulário com seu foco "Claude Agent SDK", mas o Claude entende que é ortogonal).
+Pra justificativas **concretas** em vez de formulaicas, use o ranker via Claude headless:
 
-Custo é por token. O mock é gratuito. Para começar, use o mock — quando o baseline não estiver afiado, suba para o real.
+```bash
+# Todos os items do vault
+tino rank:claude --vault "$VAULT"
+
+# Só items com nota >= 9 (mais rápido/barato)
+tino rank:claude --vault "$VAULT" --only-foca
+
+# Dry-run antes de reescrever
+tino rank:claude --vault "$VAULT" --dry-run
+```
+
+Faz batch de 15 items por call via `claude -p` headless, usando `config/prompts/rank-novelty.md`. Cada novidade recebe:
+
+- **Justificativa concreta** citando qual termo do `_perfil.md` ativou
+- **Conexão explícita** com projeto/interesse do perfil (ex: "Managed Agents casa direto com o Tino local-first")
+- **Ação sugerida** (migrar código, agendar leitura, descartar)
+- **Zero boilerplate** tipo "baseado em heurística"
+
+Cost aproximado: $0.02–$0.05 por batch de 15 items com cache quente (~$0.20–$0.30 pra 70 items).
+
+**Fluxo recomendado**: rode `tino refresh --mock` rápido pra popular `novidades/`, depois `tino rank:claude` pra refinar. Mock descobre, Claude decide e explica.
 
 A flag `--mock` no `scripts/rank.mjs` chaveia entre os dois. Os comandos `/tino:refresh` expõem a opção.
 

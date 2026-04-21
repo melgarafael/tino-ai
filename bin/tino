@@ -49,6 +49,7 @@ case "$SUB" in
   setup)            exec node "$TINO_HOME/scripts/setup.mjs" "$@" ;;
   refresh)          exec node "$TINO_HOME/scripts/refresh.mjs" "$@" ;;
   rank)             exec node "$TINO_HOME/scripts/rank.mjs" "$@" ;;
+  rank:claude)      exec node "$TINO_HOME/scripts/rank-claude.mjs" "$@" ;;
   fetch-all)        exec node "$TINO_HOME/scripts/fetch-all.mjs" "$@" ;;
   profile-sync)     exec node "$TINO_HOME/scripts/profile-sync.mjs" "$@" ;;
   deep-dive)        exec node "$TINO_HOME/scripts/deep-dive.mjs" "$@" ;;
