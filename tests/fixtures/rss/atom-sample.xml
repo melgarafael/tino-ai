@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Simon Willison's Weblog</title>
+  <link href="https://simonwillison.net/" rel="alternate"/>
+  <link href="https://simonwillison.net/atom/everything/" rel="self"/>
+  <id>https://simonwillison.net/</id>
+  <updated>2026-04-20T10:00:00Z</updated>
+
+  <entry>
+    <title>Notes on shipping an agent with Claude 4.7</title>
+    <link rel="alternate" href="https://simonwillison.net/2026/Apr/20/agent-claude-47/"/>
+    <id>tag:simonwillison.net,2026-04-20:/2026/Apr/20/agent-claude-47/</id>
+    <updated>2026-04-20T10:00:00Z</updated>
+    <published>2026-04-20T10:00:00Z</published>
+    <summary type="html">&lt;p&gt;Some &lt;em&gt;practical&lt;/em&gt; notes on shipping a small Claude 4.7 agent to production: prompt caching, compaction, tool budgets.&lt;/p&gt;</summary>
+  </entry>
+
+  <entry>
+    <title>Prompt caching explained visually</title>
+    <link rel="alternate" href="https://simonwillison.net/2026/Apr/15/prompt-caching/"/>
+    <id>tag:simonwillison.net,2026-04-15:/2026/Apr/15/prompt-caching/</id>
+    <updated>2026-04-15T12:00:00Z</updated>
+    <published>2026-04-15T12:00:00Z</published>
+    <summary>A visual walkthrough of how Anthropic prompt caching composes with tool-call loops.</summary>
+  </entry>
+</feed>

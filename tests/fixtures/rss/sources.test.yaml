@@ -1,0 +1,19 @@
+sources:
+  - id: anthropic-sample
+    name: Anthropic Sample
+    type: rss
+    url: https://example.com/anthropic.xml
+    active: true
+    weight: 1.0
+  - id: atom-sample
+    name: Atom Sample
+    type: atom
+    url: https://example.com/atom.xml
+    active: true
+    weight: 1.0
+  - id: malformed
+    name: Malformed Sample
+    type: rss
+    url: https://example.com/malformed.xml
+    active: true
+    weight: 1.0

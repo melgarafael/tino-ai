@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Broken Feed</title>
+    <link>https://example.com/broken</link>
+    <description>Feed with one valid item and one missing title.</description>
+
+    <item>
+      <title>Valid item with title and link</title>
+      <link>https://example.com/valid</link>
+      <guid isPermaLink="true">https://example.com/valid</guid>
+      <pubDate>Mon, 21 Apr 2026 08:00:00 GMT</pubDate>
+      <description>This one parses fine.</description>
+    </item>
+
+    <item>
+      <link></link>
+      <pubDate>not a real date</pubDate>
+      <description>No title, no link — should be dropped by the parser.</description>
+    </item>
+  </channel>
+</rss>

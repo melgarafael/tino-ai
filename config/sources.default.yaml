@@ -1,0 +1,126 @@
+# config/sources.default.yaml
+# Fontes default do Tino — curadas para IA aplicada, builders e research.
+# Schema por item: { id, name, type, url, active, weight }
+# type: rss | atom | html (html fica fora do MVP)
+# weight: multiplicador de relevancia (1.0 = neutro; >1 = prioridade).
+sources:
+  - id: anthropic_news
+    name: Anthropic News
+    type: rss
+    url: https://www.anthropic.com/news/rss.xml
+    active: true
+    weight: 1.5
+  - id: openai_news
+    name: OpenAI News
+    type: rss
+    url: https://openai.com/news/rss.xml
+    active: true
+    weight: 1.4
+  - id: google_deepmind
+    name: Google DeepMind Blog
+    type: rss
+    url: https://deepmind.google/blog/rss.xml
+    active: true
+    weight: 1.2
+  - id: vercel_changelog
+    name: Vercel Changelog
+    type: atom
+    url: https://vercel.com/atom
+    active: true
+    weight: 1.0
+  - id: supabase_changelog
+    name: Supabase Changelog
+    type: rss
+    url: https://supabase.com/changelog/feed.xml
+    active: true
+    weight: 1.0
+  - id: huggingface_blog
+    name: Hugging Face Blog
+    type: rss
+    url: https://huggingface.co/blog/feed.xml
+    active: true
+    weight: 1.1
+  - id: langchain_blog
+    name: LangChain Blog
+    type: rss
+    url: https://blog.langchain.dev/rss
+    active: true
+    weight: 1.0
+  - id: mistral_news
+    name: Mistral News
+    type: rss
+    url: https://mistral.ai/news/rss.xml
+    active: true
+    weight: 1.0
+  - id: simonwillison
+    name: Simon Willison
+    type: atom
+    url: https://simonwillison.net/atom/everything/
+    active: true
+    weight: 1.3
+  - id: latent_space
+    name: Latent Space
+    type: rss
+    url: https://www.latent.space/feed
+    active: true
+    weight: 1.1
+  - id: import_ai
+    name: Import AI
+    type: rss
+    url: https://importai.substack.com/feed
+    active: true
+    weight: 1.0
+  - id: bens_bites
+    name: Bens Bites
+    type: rss
+    url: https://bensbites.com/feed
+    active: true
+    weight: 0.9
+  - id: the_rundown
+    name: The Rundown AI
+    type: rss
+    url: https://www.therundown.ai/feed
+    active: true
+    weight: 0.9
+  - id: hn_frontpage
+    name: Hacker News Frontpage
+    type: rss
+    url: https://hnrss.org/frontpage
+    active: true
+    weight: 0.8
+  - id: reddit_localllama
+    name: Reddit r/LocalLLaMA
+    type: rss
+    url: https://www.reddit.com/r/LocalLLaMA/.rss
+    active: true
+    weight: 0.9
+  - id: reddit_claudeai
+    name: Reddit r/ClaudeAI
+    type: rss
+    url: https://www.reddit.com/r/ClaudeAI/.rss
+    active: true
+    weight: 1.0
+  - id: github_trending_python
+    name: GitHub Trending Python (weekly)
+    type: atom
+    url: https://github.com/trending/python?since=weekly&format=atom
+    active: true
+    weight: 0.8
+  - id: hf_papers
+    name: Hugging Face Papers
+    type: html
+    url: https://huggingface.co/papers
+    active: false
+    weight: 1.0
+  - id: arxiv_cs_ai
+    name: arXiv cs.AI
+    type: rss
+    url: http://export.arxiv.org/rss/cs.AI
+    active: true
+    weight: 1.0
+  - id: cohere_blog
+    name: Cohere Blog
+    type: rss
+    url: https://cohere.com/blog/rss.xml
+    active: true
+    weight: 0.9
