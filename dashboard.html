@@ -425,38 +425,61 @@ async function writeFileContent(dir, name, content) {
 async function loadFromVault() {
   const tino = state.tinoHandle;
   const data = { news: [], profile: clone(MOCK_PROFILE), config: clone(MOCK_CONFIG) };
+  const diag = {
+    vaultName: state.vaultName,
+    tinoFound: true,
+    perfilFound: false,
+    configFound: false,
+    novidadesFound: false,
+    mdFiles: 0,
+    parsed: 0,
+    parseErrors: [],
+    firstFewTitles: [],
+  };
 
-  try { data.profile = hydrateProfile(await readFile(tino, '_perfil.md')); } catch {}
-  try { data.config = await readFile(tino, '_config.md'); } catch {}
+  try { data.profile = hydrateProfile(await readFile(tino, '_perfil.md')); diag.perfilFound = true; } catch (e) { diag.perfilError = String(e?.message || e); }
+  try { data.config = await readFile(tino, '_config.md'); diag.configFound = true; } catch {}
 
   try {
     const novDir = await tino.getDirectoryHandle('novidades');
+    diag.novidadesFound = true;
     data.news = [];
     for await (const [name, h] of novDir.entries()) {
       if (h.kind !== 'file' || !name.endsWith('.md')) continue;
-      const file = await h.getFile();
-      const text = await file.text();
-      const parsed = parseFrontmatter(text);
-      data.news.push({
-        id: String(parsed.meta.id || name.replace(/\.md$/, '')),
-        titulo: String(parsed.meta.titulo || '(sem título)'),
-        fonte: String(parsed.meta.fonte || ''),
-        data: String(parsed.meta.data || ''),
-        tipo: String(parsed.meta.tipo || ''),
-        nota: Number(parsed.meta.nota) || 0,
-        veredito: String(parsed.meta.veredito || ''),
-        resumo: String(parsed.meta.resumo || ''),
-        cite: String(parsed.meta.cite || ''),
-        url: String(parsed.meta.url || ''),
-        favorito: parsed.meta.favorito === true,
-        body: parsed.body,
-        _filename: name
-      });
+      diag.mdFiles += 1;
+      try {
+        const file = await h.getFile();
+        const text = await file.text();
+        const parsed = parseFrontmatter(text);
+        data.news.push({
+          id: String(parsed.meta.id || name.replace(/\.md$/, '')),
+          titulo: String(parsed.meta.titulo || '(sem título)'),
+          fonte: String(parsed.meta.fonte || ''),
+          data: String(parsed.meta.data || ''),
+          tipo: String(parsed.meta.tipo || ''),
+          nota: Number(parsed.meta.nota) || 0,
+          veredito: String(parsed.meta.veredito || ''),
+          resumo: String(parsed.meta.resumo || ''),
+          cite: String(parsed.meta.cite || ''),
+          url: String(parsed.meta.url || ''),
+          favorito: parsed.meta.favorito === true,
+          body: parsed.body,
+          _filename: name
+        });
+        diag.parsed += 1;
+      } catch (e) {
+        diag.parseErrors.push({ file: name, error: String(e?.message || e) });
+      }
     }
     data.news.sort((a, b) => (b.nota - a.nota) || String(b.data).localeCompare(String(a.data)));
-  } catch {}
+    diag.firstFewTitles = data.news.slice(0, 5).map(n => `${n.nota} · ${n.titulo}`);
+  } catch (e) {
+    diag.novidadesError = String(e?.message || e);
+  }
 
   state.data = data;
+  state.diag = diag;
+  if (typeof console !== 'undefined' && console.info) console.info('[Tino] loadFromVault diagnostics', diag);
 }
 
 function hydrateProfile(parsed) {
@@ -801,17 +824,48 @@ function renderToday() {
 
   if (total === 0) {
     const isConnected = state.mode === 'connected';
+    const d = state.diag || {};
     const children = [
-      el('h2', { text: isConnected ? 'Vault conectado mas sem novidades' : 'Nenhuma novidade ainda' }),
-      el('p', { text: isConnected
-        ? `Não encontrei arquivos .md em ${state.vaultName || 'vault'}/Tino/novidades/. Rode o comando de refresh do Claude Code pra popular, ou volte pro modo demo.`
-        : 'Rode o comando de refresh do seu Claude Code para que o Tino processe as fontes e popule esta visualização.' }),
-      el('div', { class: 'cmd', style: 'display:inline-block;font-size:13px;padding:10px 16px', text: '/tino:refresh' })
+      el('h2', { text: isConnected ? 'Vault conectado, mas sem novidades carregadas' : 'Nenhuma novidade ainda' }),
     ];
     if (isConnected) {
+      children.push(el('p', { text: `Vault: ${d.vaultName || state.vaultName || '—'}` }));
+      const checks = el('ul', { style: 'text-align:left;max-width:480px;margin:16px auto;list-style:none;padding:0' });
+      const bullet = (label, ok, extra) => el('li', { style: 'padding:6px 0;color:' + (ok ? 'var(--high)' : 'var(--danger)') },
+        (ok ? '✓ ' : '✗ ') + label + (extra ? ' — ' + extra : ''));
+      checks.append(
+        bullet('pasta Tino/', true),
+        bullet('_perfil.md', d.perfilFound, d.perfilError || (d.perfilFound ? null : 'não encontrado')),
+        bullet('_config.md', d.configFound, d.configFound ? null : 'não encontrado'),
+        bullet('pasta novidades/', d.novidadesFound, d.novidadesError || (d.novidadesFound ? null : 'não existe')),
+        bullet(`arquivos .md em novidades/`, d.mdFiles > 0, `${d.mdFiles || 0} encontrados, ${d.parsed || 0} parseados ok`),
+      );
+      if (d.parseErrors && d.parseErrors.length) {
+        const details = el('details', { style: 'max-width:480px;margin:12px auto;text-align:left' },
+          el('summary', { text: `${d.parseErrors.length} arquivo(s) com erro de parse` }),
+        );
+        d.parseErrors.slice(0, 5).forEach(p => details.append(el('div', { style: 'font-size:12px;color:var(--text-faint);padding:4px 0', text: `${p.file} — ${p.error}` })));
+        children.push(details);
+      }
+      children.push(checks);
+      let hint;
+      if (!d.novidadesFound) {
+        hint = `A pasta novidades/ não existe dentro de Tino/. Rode o refresh no terminal:`;
+      } else if (d.mdFiles === 0) {
+        hint = `A pasta está vazia. Rode o refresh:`;
+      } else if (d.parsed === 0) {
+        hint = `Tem ${d.mdFiles} arquivos .md mas nenhum parseou. Verifique o frontmatter.`;
+      } else {
+        hint = `Algo inesperado. Verifique o console do navegador.`;
+      }
+      children.push(el('p', { style: 'margin-top:20px', text: hint }));
+      children.push(el('div', { class: 'cmd', style: 'display:inline-block;font-size:12px;padding:10px 16px', text: `node scripts/refresh.mjs --vault "<path-do-seu-vault>" --mock --force` }));
       children.push(el('p', { style: 'margin-top:24px' },
         el('button', { class: 'cta', onclick: disconnectVault, text: 'Voltar ao modo demo' })
       ));
+    } else {
+      children.push(el('p', { text: 'Rode o comando de refresh do seu Claude Code para que o Tino processe as fontes e popule esta visualização.' }));
+      children.push(el('div', { class: 'cmd', style: 'display:inline-block;font-size:13px;padding:10px 16px', text: '/tino:refresh' }));
     }
     root.appendChild(el('div', { class: 'empty' }, ...children));
     return;
