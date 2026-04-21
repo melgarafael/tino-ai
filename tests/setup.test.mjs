@@ -64,6 +64,35 @@ test('setup --mock escreve _perfil.md valido com frontmatter e 3 secoes', async 
   assert.match(body, /## Evita/);
 });
 
+test('setup --mock escreve chips como arrays no frontmatter (schema dashboard)', async () => {
+  const vault = await cloneSampleVault();
+  const { code, stdout } = runSetup(['--vault', vault, '--mock', '--force']);
+  assert.equal(code, 0, `stdout:\n${stdout}`);
+
+  const perfilPath = path.join(vault, 'Tino', '_perfil.md');
+  const raw = await fs.readFile(perfilPath, 'utf8');
+  const { meta, body } = parse(raw);
+
+  // Arrays exigidos pelo hydrateProfile do dashboard.
+  assert.ok(Array.isArray(meta.foco_ativo), 'foco_ativo deve ser array');
+  assert.ok(meta.foco_ativo.length > 0, 'foco_ativo deve ter >=1 elemento');
+  assert.ok(Array.isArray(meta.identidade), 'identidade deve ser array');
+  assert.ok(meta.identidade.length > 0, 'identidade deve ter >=1 elemento');
+  assert.ok(Array.isArray(meta.evita), 'evita deve ser array');
+
+  // Defaults de contador/identidade.
+  assert.equal(meta.nome, '(preencher)');
+  assert.match(String(meta.atualizado), /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(meta.processadas, 0);
+  assert.equal(meta.favoritadas, 0);
+  assert.equal(meta.thumb_up, 0);
+  assert.equal(meta.thumb_down, 0);
+  assert.equal(meta.acerto, 0);
+
+  // Body nao deve carregar as linhas inline **Chips:**.
+  assert.ok(!/\*\*Chips:\*\*/.test(body), 'body nao deve conter linha "**Chips:**"');
+});
+
 test('setup --mock menciona "Claude" e "Tomik" (vindas do sample)', async () => {
   const vault = await cloneSampleVault();
   const { code } = runSetup(['--vault', vault, '--mock', '--force']);

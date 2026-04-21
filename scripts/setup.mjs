@@ -53,36 +53,35 @@ function printHelp() {
 }
 
 // --- buckets para mock mode ---
-// Mantem lowercase. Match e substring simples sobre o pool do corpo dos top files.
-const IDENTIDADE_CHIPS = [
-  'founder',
-  'cto',
-  'saas',
-  'crm',
-  'next.js',
-  'supabase',
-  'claude code',
-  'obsidian',
-  'b2b',
-];
+// Match: chave lowercase (substring no pool); valor: label canonico a gravar.
+// O label preserva casing/acentos esperados pelo dashboard (hydrateProfile).
+const IDENTIDADE_CHIPS = {
+  'saas b2b': 'SaaS B2B',
+  'founder': 'Founder',
+  'cto': 'CTO',
+  'claude code': 'Claude Code',
+  'obsidian': 'Obsidian',
+  'next.js': 'Next.js',
+  'supabase': 'Supabase',
+};
 
-const FOCO_CHIPS = [
-  'claude agent sdk',
-  'managed agents',
-  'context engineering',
-  'mcp',
-  'rag',
-  'llm',
-];
+const FOCO_CHIPS = {
+  'claude agent sdk': 'Claude Agent SDK',
+  'managed agents': 'Managed Agents',
+  'context engineering': 'Context engineering',
+  'mcp': 'MCP',
+  'rag': 'RAG',
+  'llm': 'LLM',
+};
 
 // Padroes para extrair "evita". Cada regex captura uma linha/frase apos o gatilho.
 // Como Obsidian costuma usar bullets, tambem aceitamos a linha inteira do bullet.
 const EVITA_TRIGGERS = [/\bevita\b/i, /sem interesse em/i, /n[aã]o uso/i];
 
-function pickChips(pool, chips) {
+function pickChips(pool, chipsMap) {
   const hits = [];
-  for (const chip of chips) {
-    if (pool.includes(chip)) hits.push(chip);
+  for (const [needle, label] of Object.entries(chipsMap)) {
+    if (pool.includes(needle)) hits.push(label);
   }
   return hits;
 }
@@ -258,17 +257,13 @@ function extractFocoBullets(docs) {
   return bullets;
 }
 
-function buildMockPerfilBody({ identidadeChips, identidadeBody, focoChips, focoBullets, evita, vaultName, sourceFiles }) {
+function buildMockPerfilBody({ identidadeBody, focoBullets, evita, vaultName, sourceFiles }) {
   const lines = [];
   lines.push(`# Perfil — ${vaultName}`);
   lines.push('');
   lines.push('> Gerado em modo `--mock` (heuristica deterministica). Revisar antes de usar em producao.');
   lines.push('');
   lines.push('## Identidade');
-  if (identidadeChips.length > 0) {
-    lines.push(`**Chips:** ${identidadeChips.join(', ')}`);
-    lines.push('');
-  }
   if (identidadeBody) {
     lines.push(identidadeBody);
   } else {
@@ -276,10 +271,6 @@ function buildMockPerfilBody({ identidadeChips, identidadeBody, focoChips, focoB
   }
   lines.push('');
   lines.push('## Foco ativo');
-  if (focoChips.length > 0) {
-    lines.push(`**Chips:** ${focoChips.join(', ')}`);
-    lines.push('');
-  }
   if (focoBullets.length > 0) {
     for (const b of focoBullets) lines.push(`- ${b}`);
   } else {
@@ -455,18 +446,30 @@ async function main() {
       const evita = extractEvita(docs.map((d) => d.body));
 
       const body = buildMockPerfilBody({
-        identidadeChips,
         identidadeBody,
-        focoChips,
         focoBullets,
         evita,
         vaultName,
         sourceFiles,
       });
+      const today = new Date().toISOString().slice(0, 10);
+      // Ordem das chaves casa com o esquema que o dashboard (hydrateProfile) le:
+      // nome/atualizado primeiro, chips como arrays, contadores zerados, metadata
+      // do gerador por ultimo.
       const meta = {
+        nome: '(preencher)',
+        atualizado: today,
+        foco_ativo: focoChips,
+        identidade: identidadeChips,
+        evita,
+        processadas: 0,
+        favoritadas: 0,
+        thumb_up: 0,
+        thumb_down: 0,
+        acerto: 0,
         tipo: 'perfil',
-        gerado_em: new Date().toISOString().slice(0, 10),
         modo: 'mock',
+        gerado_em: today,
         fontes: sourceFiles.length,
       };
       await fs.writeFile(perfilPath, serialize(meta, body), 'utf8');
