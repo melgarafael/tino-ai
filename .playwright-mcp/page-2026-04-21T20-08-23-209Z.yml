@@ -1,0 +1,155 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - heading "Tino." [level=1] [ref=e5]
+      - generic [ref=e6]:
+        - generic [ref=e8]: modo demo
+        - generic [ref=e9]: ·
+        - button "Conectar vault" [ref=e10] [cursor=pointer]
+    - tablist [ref=e11]:
+      - button "Hoje 5" [ref=e12] [cursor=pointer]
+      - button "Favoritos 0" [ref=e13] [cursor=pointer]
+      - button "Perfil" [ref=e14] [cursor=pointer]
+      - button "Config" [ref=e15] [cursor=pointer]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - paragraph [ref=e19]:
+        - text: Você está em dia.
+        - strong [ref=e20]: 5 novidades
+        - text: merecem teu foco hoje de 9 analisadas. As demais podem ser ignoradas com tranquilidade.
+        - generic [ref=e21]: Tino lê seu vault Obsidian, monitora suas fontes configuradas e ranqueia o que é realmente relevante para o seu momento.
+      - generic [ref=e22]:
+        - heading "Focar hoje" [level=2] [ref=e23]:
+          - emphasis [ref=e24]: Focar
+          - text: hoje
+        - generic [ref=e25]: nota 9+ · altamente aplicável
+      - generic [ref=e26]:
+        - article [ref=e27] [cursor=pointer]:
+          - generic [ref=e28]:
+            - text: "9.4"
+            - generic [ref=e29]: nota
+          - generic [ref=e30]:
+            - heading "Claude Managed Agents entra em GA" [level=3] [ref=e31]
+            - generic [ref=e32]:
+              - generic [ref=e33]: Anthropic Blog
+              - generic [ref=e34]: ·
+              - generic [ref=e35]: release · 2026-04-21
+            - paragraph [ref=e36]:
+              - generic [ref=e37]: Foca
+              - text: Infra oficial de orquestração multi-agente Claude — aplicável direto ao pipeline que você está construindo no próprio Tino.
+            - text: ↳ ☆
+          - generic [ref=e38]:
+            - text: expandir
+            - generic [ref=e39]: ▾
+        - article [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]:
+            - text: "9.1"
+            - generic [ref=e42]: nota
+          - generic [ref=e43]:
+            - heading "Claude Agent SDK 1.0 estável" [level=3] [ref=e44]
+            - generic [ref=e45]:
+              - generic [ref=e46]: Anthropic Engineering
+              - generic [ref=e47]: ·
+              - generic [ref=e48]: release · 2026-04-20
+            - paragraph [ref=e49]:
+              - generic [ref=e50]: Foca
+              - text: SDK oficial sai de beta — hooks, custom tools, permissions estabilizados. Você marcou isso como foco de estudo atual.
+            - text: ↳ ☆
+          - generic [ref=e51]:
+            - text: expandir
+            - generic [ref=e52]: ▾
+      - generic [ref=e53]:
+        - heading "Considerar" [level=2] [ref=e54]:
+          - emphasis [ref=e55]: Considerar
+        - generic [ref=e56]: nota 7–8.9 · relevante contextual
+      - generic [ref=e57]:
+        - article [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]:
+            - text: "8.2"
+            - generic [ref=e60]: nota
+          - generic [ref=e61]:
+            - heading "Vercel Workflow DevKit chega em GA" [level=3] [ref=e62]
+            - generic [ref=e63]:
+              - generic [ref=e64]: Vercel Changelog
+              - generic [ref=e65]: ·
+              - generic [ref=e66]: release · 2026-04-19
+            - paragraph [ref=e67]:
+              - generic [ref=e68]: Considera
+              - text: Workflows duráveis com pause/resume, retries e state. Alternativa ao BullMQ que você tentou no Tomik.
+            - text: ↳ ☆
+          - generic [ref=e69]:
+            - text: expandir
+            - generic [ref=e70]: ▾
+        - article [ref=e71] [cursor=pointer]:
+          - generic [ref=e72]:
+            - text: "7.8"
+            - generic [ref=e73]: nota
+          - generic [ref=e74]:
+            - heading "Context Engineering Spec v1 publicada" [level=3] [ref=e75]
+            - generic [ref=e76]:
+              - generic [ref=e77]: LangChain Blog
+              - generic [ref=e78]: ·
+              - generic [ref=e79]: framework · 2026-04-17
+            - paragraph [ref=e80]:
+              - generic [ref=e81]: Considera
+              - text: Formalização do que você já pratica empiricamente — nomenclatura comum acelera conversas com a comunidade.
+            - text: ↳ ☆
+          - generic [ref=e82]:
+            - text: expandir
+            - generic [ref=e83]: ▾
+        - article [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]:
+            - text: "7.1"
+            - generic [ref=e86]: nota
+          - generic [ref=e87]:
+            - heading "Supabase Realtime Presence v2" [level=3] [ref=e88]
+            - generic [ref=e89]:
+              - generic [ref=e90]: Supabase Changelog
+              - generic [ref=e91]: ·
+              - generic [ref=e92]: release · 2026-04-18
+            - paragraph [ref=e93]:
+              - generic [ref=e94]: Considera
+              - text: API de presença mais performática — aplicável ao módulo de colaboração do Tomik, sem urgência.
+            - text: ↳ ☆
+          - generic [ref=e95]:
+            - text: expandir
+            - generic [ref=e96]: ▾
+      - generic [ref=e97]:
+        - heading "Ignorar por ora" [level=2] [ref=e98]:
+          - emphasis [ref=e99]: Ignorar
+          - text: por ora
+        - generic [ref=e100]: nota < 7 · fora do seu contexto atual
+      - generic [ref=e101]:
+        - article [ref=e102] [cursor=pointer]:
+          - generic [ref=e103]: "5.1"
+          - generic [ref=e104]:
+            - heading "GitHub Copilot Workspace agora suporta agentes customizados" [level=3] [ref=e105]
+            - paragraph [ref=e106]:
+              - generic [ref=e107]: Ignore
+              - text: Você não usa Copilot — seu fluxo é Claude Code. Informação de mercado apenas.
+        - article [ref=e108] [cursor=pointer]:
+          - generic [ref=e109]: "4.5"
+          - generic [ref=e110]:
+            - heading "Gemini 2.5 Flash ganha modo thinking" [level=3] [ref=e111]
+            - paragraph [ref=e112]:
+              - generic [ref=e113]: Ignore
+              - text: Sem projeto ativo em Gemini. Reavaliação sugerida quando for benchmarkar providers.
+        - article [ref=e114] [cursor=pointer]:
+          - generic [ref=e115]: "3.8"
+          - generic [ref=e116]:
+            - heading "OpenAI Realtime API expande áudio para 12 línguas" [level=3] [ref=e117]
+            - paragraph [ref=e118]:
+              - generic [ref=e119]: Ignore
+              - text: Zero projetos seus envolvem áudio. Pode descartar.
+        - article [ref=e120] [cursor=pointer]:
+          - generic [ref=e121]: "3.2"
+          - generic [ref=e122]:
+            - heading "Mistral Medium 3 quebra benchmarks de matemática" [level=3] [ref=e123]
+            - paragraph [ref=e124]:
+              - generic [ref=e125]: Ignore
+              - text: Seu uso atual não é math-heavy. Releva.
+  - contentinfo [ref=e126]:
+    - generic [ref=e127]:
+      - text: Tino ·
+      - emphasis [ref=e128]: ter tino é ter discernimento
+    - generic [ref=e129]: Gerado localmente · nenhum dado sai da sua máquina

@@ -4,7 +4,7 @@ atualizado: 2026-04-21
 foco_ativo: [Claude Agent SDK, Managed Agents, Context engineering, MCP, LLM]
 identidade: [SaaS B2B, Founder, CTO, Claude Code, Obsidian, Next.js, Supabase]
 evita: [Geração de vídeo por IA, Voice cloning, Debates filosóficos sobre consciência de LLMs, Hype de AGI]
-processadas: 0
+processadas: 5
 favoritadas: 0
 thumb_up: 0
 thumb_down: 0
@@ -14,6 +14,7 @@ modo: mock
 gerado_em: 2026-04-21
 fontes: 2
 ---
+
 
 # Perfil — perfil-raw
 

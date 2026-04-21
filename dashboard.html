@@ -800,11 +800,20 @@ function renderToday() {
   const total = state.data.news.length;
 
   if (total === 0) {
-    root.appendChild(el('div', { class: 'empty' },
-      el('h2', { text: 'Nenhuma novidade ainda' }),
-      el('p', { text: 'Rode o comando de refresh do seu Claude Code para que o Tino processe as fontes e popule esta visualização.' }),
+    const isConnected = state.mode === 'connected';
+    const children = [
+      el('h2', { text: isConnected ? 'Vault conectado mas sem novidades' : 'Nenhuma novidade ainda' }),
+      el('p', { text: isConnected
+        ? `Não encontrei arquivos .md em ${state.vaultName || 'vault'}/Tino/novidades/. Rode o comando de refresh do Claude Code pra popular, ou volte pro modo demo.`
+        : 'Rode o comando de refresh do seu Claude Code para que o Tino processe as fontes e popule esta visualização.' }),
       el('div', { class: 'cmd', style: 'display:inline-block;font-size:13px;padding:10px 16px', text: '/tino:refresh' })
-    ));
+    ];
+    if (isConnected) {
+      children.push(el('p', { style: 'margin-top:24px' },
+        el('button', { class: 'cta', onclick: disconnectVault, text: 'Voltar ao modo demo' })
+      ));
+    }
+    root.appendChild(el('div', { class: 'empty' }, ...children));
     return;
   }
 
@@ -1013,8 +1022,31 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }));
 
+/* Tenta carregar dashboard-data.json (dumpado por scripts/generate-dashboard-data.mjs).
+   Usado quando o dashboard é servido via HTTP local e há um snapshot do vault sample.
+   Se ausente ou inválido, cai no MOCK embutido. */
+async function tryLoadDemoData() {
+  try {
+    const res = await fetch('./dashboard-data.json', { cache: 'no-store' });
+    if (!res.ok) return false;
+    const payload = await res.json();
+    if (!payload || !Array.isArray(payload.news) || payload.news.length === 0) return false;
+    state.data = {
+      news: payload.news,
+      profile: payload.profile || clone(MOCK_PROFILE),
+      config: payload.config || clone(MOCK_CONFIG),
+    };
+    state.demoSource = payload.meta?.source || 'dashboard-data.json';
+    return true;
+  } catch { return false; }
+}
+
 /* BOOT */
-(async () => { render(); await tryRestore(); })();
+(async () => {
+  await tryLoadDemoData();
+  render();
+  await tryRestore();
+})();
 </script>
 
 </body>
