@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tino — curador pessoal de IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #13110f;
+    --bg-elev: #1a1815;
+    --bg-card: #181613;
+    --text: #eae3d2;
+    --text-dim: #9a9186;
+    --text-faint: #6a6359;
+    --accent: #d4a24c;
+    --accent-dim: #8a6c34;
+    --border: #2a2620;
+    --border-soft: #211e1a;
+    --high: #8fb174;
+    --mid: #d4a24c;
+    --low: #7a736a;
+    --danger: #b76454;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-dim); }
+  a:hover { color: var(--text); border-color: var(--text); }
+  code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; }
+
+  .container { max-width: 1080px; margin: 0 auto; padding: 48px 32px 96px; }
+
+  .banner { background: var(--bg-elev); border-bottom: 1px solid var(--border); padding: 12px 32px; display: flex; align-items: center; justify-content: center; gap: 16px; font-size: 13px; color: var(--text-dim); position: sticky; top: 0; z-index: 10; }
+  .banner.warn { border-bottom-color: var(--accent-dim); }
+  .banner .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .banner.ok .dot { background: var(--high); box-shadow: 0 0 10px rgba(143,177,116,0.4); }
+  .banner.warn .dot { background: var(--accent); box-shadow: 0 0 10px rgba(212,162,76,0.4); }
+  .banner button { color: var(--accent); border: 1px solid var(--accent-dim); padding: 5px 12px; border-radius: 3px; font-size: 12px; transition: all .15s; }
+  .banner button:hover { background: var(--accent); color: var(--bg); }
+  .banner strong { color: var(--text); font-weight: 500; }
+
+  header { padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+  .brand-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+  .brand { font-family: 'Newsreader', serif; font-weight: 500; font-size: 44px; letter-spacing: -0.02em; font-style: italic; }
+  .brand::after { content: '.'; color: var(--accent); }
+  .status { display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 13px; font-feature-settings: 'tnum'; flex-wrap: wrap; }
+  .status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--high); display: inline-block; box-shadow: 0 0 10px rgba(143,177,116,0.4); }
+  .status .dot.mock { background: var(--accent); box-shadow: 0 0 10px rgba(212,162,76,0.4); }
+  .status .sep { opacity: 0.4; }
+  .status .btn-inline { padding: 3px 10px; font-size: 12px; }
+
+  nav.tabs { display: flex; gap: 4px; }
+  .tab { padding: 8px 14px; color: var(--text-dim); font-size: 14px; font-weight: 450; border-radius: 4px; transition: color .15s, background .15s; letter-spacing: 0.01em; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); background: var(--bg-elev); }
+  .tab .count { color: var(--text-faint); font-size: 12px; margin-left: 6px; font-feature-settings: 'tnum'; }
+  .tab.active .count { color: var(--accent); }
+
+  .view { display: none; }
+  .view.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .calm { padding: 28px 32px; background: var(--bg-elev); border-left: 2px solid var(--accent); margin-bottom: 56px; border-radius: 0 4px 4px 0; }
+  .calm p { font-family: 'Newsreader', serif; font-size: 22px; line-height: 1.45; font-weight: 400; color: var(--text); }
+  .calm strong { color: var(--accent); font-weight: 500; font-style: italic; }
+  .calm .sub { display: block; margin-top: 10px; font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-dim); font-style: normal; }
+
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 48px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-soft); }
+  .section-head:first-child { margin-top: 0; }
+  .section-head h2 { font-family: 'Newsreader', serif; font-weight: 500; font-size: 24px; letter-spacing: -0.01em; }
+  .section-head h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .section-head .hint { font-size: 12px; color: var(--text-faint); letter-spacing: 0.04em; text-transform: uppercase; }
+  .section-head .hint code { color: var(--text-dim); }
+
+  .cards { display: flex; flex-direction: column; gap: 4px; }
+  .card { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 4px; padding: 22px 26px; display: grid; grid-template-columns: 72px 1fr auto; gap: 24px; align-items: start; cursor: pointer; transition: border-color .15s, background .15s; }
+  .card:hover { border-color: var(--border); background: var(--bg-elev); }
+  .card.expanded { border-color: var(--accent-dim); background: var(--bg-elev); }
+
+  .score-col { }
+  .score { font-family: 'Newsreader', serif; font-style: italic; font-size: 46px; line-height: 1; font-weight: 500; font-feature-settings: 'tnum'; letter-spacing: -0.03em; }
+  .score.high { color: var(--high); }
+  .score.mid { color: var(--mid); }
+  .score.low { color: var(--low); }
+  .score-label { display: block; font-family: 'Inter', sans-serif; font-style: normal; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-top: 4px; }
+
+  .card-body h3 { font-family: 'Newsreader', serif; font-weight: 500; font-size: 20px; line-height: 1.3; letter-spacing: -0.005em; margin-bottom: 6px; }
+  .card-meta { display: flex; gap: 10px; align-items: center; color: var(--text-dim); font-size: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .card-meta .source { color: var(--text); font-weight: 450; }
+  .card-meta .sep { opacity: 0.4; }
+  .verdict { color: var(--text-dim); font-size: 14px; line-height: 1.5; }
+  .verdict .tag { display: inline-block; padding: 1px 8px; border-radius: 2px; font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-right: 8px; vertical-align: 1px; }
+  .tag.focar { background: rgba(143,177,116,0.15); color: var(--high); }
+  .tag.considera { background: rgba(212,162,76,0.15); color: var(--accent); }
+  .tag.acompanha { background: rgba(154,145,134,0.12); color: var(--text-dim); }
+  .tag.ignore { background: rgba(122,115,106,0.1); color: var(--text-faint); }
+
+  .card-action { color: var(--text-faint); font-size: 12px; align-self: center; white-space: nowrap; }
+  .card.expanded .card-action .chev { transform: rotate(180deg); }
+  .chev { display: inline-block; transition: transform .2s; margin-left: 4px; }
+
+  .expand { grid-column: 1 / -1; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border); display: none; }
+  .card.expanded .expand { display: block; animation: fade .2s ease; }
+  .reason { background: rgba(212,162,76,0.04); border-left: 2px solid var(--accent-dim); padding: 16px 20px; margin-bottom: 20px; border-radius: 0 4px 4px 0; }
+  .reason .label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .reason p { font-family: 'Newsreader', serif; font-size: 16px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .reason .cite { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-dim); font-style: italic; }
+  .reason .cite::before { content: '↳ '; color: var(--accent); font-style: normal; }
+
+  .expand-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+  .act { padding: 8px 14px; font-size: 13px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 3px; transition: all .15s; background: transparent; }
+  .act:hover { color: var(--text); border-color: var(--text-dim); }
+  .act.primary { color: var(--accent); border-color: var(--accent-dim); }
+  .act.primary:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .act.primary.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .act.primary.active::before { content: '★ '; }
+  .act.primary:not(.active)::before { content: '☆ '; }
+  .act.thumb.up.active { color: var(--high); border-color: var(--high); }
+  .act.thumb.down.active { color: var(--danger); border-color: var(--danger); }
+
+  .ignored { display: flex; flex-direction: column; gap: 2px; opacity: 0.7; }
+  .ignored .card { grid-template-columns: 48px 1fr auto; padding: 14px 22px; gap: 20px; }
+  .ignored .score { font-size: 28px; }
+  .ignored .score-label { display: none; }
+  .ignored h3 { font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 500; }
+  .ignored .card-meta { display: none; }
+  .ignored .verdict { font-size: 12px; }
+
+  .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .profile-card { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 4px; padding: 28px; }
+  .profile-card h3 { font-family: 'Newsreader', serif; font-weight: 500; font-size: 20px; margin-bottom: 6px; letter-spacing: -0.005em; }
+  .profile-card .caption { font-size: 12px; color: var(--text-faint); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 20px; }
+  .profile-card p { color: var(--text-dim); font-size: 14px; margin-bottom: 10px; white-space: pre-wrap; }
+  .profile-card strong { color: var(--text); font-weight: 500; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .chip { padding: 4px 10px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 2px; font-size: 12px; color: var(--text-dim); }
+  .chip.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(212,162,76,0.08); }
+
+  .empty { text-align: center; padding: 80px 20px; color: var(--text-dim); max-width: 640px; margin: 0 auto; }
+  .empty h2 { font-family: 'Newsreader', serif; font-weight: 500; font-style: italic; font-size: 32px; margin-bottom: 16px; color: var(--text); letter-spacing: -0.01em; }
+  .empty p { font-size: 15px; margin-bottom: 28px; }
+  .empty .cta { display: inline-block; padding: 14px 28px; background: var(--accent); color: var(--bg); border: 0; border-radius: 3px; font-size: 14px; font-weight: 500; letter-spacing: 0.01em; cursor: pointer; transition: transform .1s; }
+  .empty .cta:hover { transform: translateY(-1px); }
+  .empty .sub { font-size: 12px; color: var(--text-faint); margin-top: 16px; }
+
+  .setting-row { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--border-soft); gap: 24px; }
+  .setting-row:last-child { border: 0; }
+  .setting-row .k { font-family: 'Newsreader', serif; font-size: 17px; font-weight: 500; flex: 1; }
+  .setting-row .k small { display: block; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: var(--text-faint); margin-top: 4px; font-style: normal; }
+  .setting-row .v { color: var(--text-dim); font-size: 14px; font-feature-settings: 'tnum'; text-align: right; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .cmd { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; background: var(--bg-elev); padding: 4px 8px; border-radius: 3px; color: var(--accent); border: 1px solid var(--border); }
+  .btn-inline { padding: 6px 12px; background: transparent; border: 1px solid var(--accent-dim); color: var(--accent); border-radius: 3px; font-size: 12px; transition: all .15s; cursor: pointer; }
+  .btn-inline:hover { background: var(--accent); color: var(--bg); }
+  .btn-inline.danger { border-color: var(--border); color: var(--text-dim); }
+  .btn-inline.danger:hover { background: var(--danger); color: var(--text); border-color: var(--danger); }
+
+  details { margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 4px; padding: 20px 24px; }
+  details summary { cursor: pointer; font-family: 'Newsreader', serif; font-size: 17px; font-weight: 500; color: var(--text); }
+  details summary::marker { color: var(--accent); }
+  details pre { margin-top: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 16px; overflow-x: auto; font-size: 12px; line-height: 1.6; color: var(--text-dim); }
+
+  footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap; }
+  footer em { font-family: 'Newsreader', serif; font-style: italic; color: var(--text-dim); }
+
+  @media (max-width: 720px) {
+    .container { padding: 32px 20px 64px; }
+    .brand { font-size: 36px; }
+    .card { grid-template-columns: 56px 1fr; gap: 16px; padding: 18px 20px; }
+    .card-action { display: none; }
+    .score { font-size: 38px; }
+    .profile-grid { grid-template-columns: 1fr; }
+    .calm p { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="banner" class="banner warn" style="display:none">
+  <span class="dot"></span>
+  <span id="banner-text"></span>
+  <button id="banner-action"></button>
+</div>
+
+<div class="container">
+
+<header>
+  <div class="brand-row">
+    <h1 class="brand">Tino</h1>
+    <div class="status" id="status"></div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-view="today">Hoje <span class="count" id="count-today">0</span></button>
+    <button class="tab" data-view="favorites">Favoritos <span class="count" id="count-fav">0</span></button>
+    <button class="tab" data-view="profile">Perfil</button>
+    <button class="tab" data-view="settings">Config</button>
+  </nav>
+</header>
+
+<main>
+  <section id="today" class="view active"></section>
+  <section id="favorites" class="view"></section>
+  <section id="profile" class="view"></section>
+  <section id="settings" class="view"></section>
+</main>
+
+<footer>
+  <span>Tino · <em>ter tino é ter discernimento</em></span>
+  <span>Gerado localmente · nenhum dado sai da sua máquina</span>
+</footer>
+
+</div>
+
+<script>
+/* ========================================================================
+   TINO — single-file dashboard
+   Lê markdown estruturado de {vault}/Tino/ via File System Access API.
+   Renderização 100% via DOM methods (sem innerHTML / sem XSS).
+   ======================================================================== */
+
+/* ---------------- DOM helpers ---------------- */
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  if (attrs) {
+    for (const k of Object.keys(attrs)) {
+      const v = attrs[k];
+      if (v == null || v === false) continue;
+      if (k === 'class') node.className = v;
+      else if (k === 'text') node.textContent = v;
+      else if (k === 'style') node.setAttribute('style', v);
+      else if (k.startsWith('on') && typeof v === 'function') node[k] = v;
+      else node.setAttribute(k, v);
+    }
+  }
+  for (const c of children.flat()) {
+    if (c == null || c === false) continue;
+    if (typeof c === 'string' || typeof c === 'number') node.appendChild(document.createTextNode(String(c)));
+    else node.appendChild(c);
+  }
+  return node;
+}
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+function mdInline(text) {
+  const out = [];
+  const src = String(text || '');
+  const matches = Array.from(src.matchAll(/\*\*(.+?)\*\*/g));
+  let last = 0;
+  for (const m of matches) {
+    if (m.index > last) pushLines(out, src.slice(last, m.index));
+    out.push(el('strong', { text: m[1] }));
+    last = m.index + m[0].length;
+  }
+  if (last < src.length) pushLines(out, src.slice(last));
+  return out;
+}
+function pushLines(arr, str) {
+  const lines = str.split('\n');
+  lines.forEach((l, i) => {
+    if (l) arr.push(document.createTextNode(l));
+    if (i < lines.length - 1) arr.push(el('br'));
+  });
+}
+function isSafeUrl(u) { if (!u) return false; try { const p = new URL(u, 'http://x/'); return p.protocol === 'http:' || p.protocol === 'https:'; } catch { return false; } }
+
+/* ---------------- Mock data (modo demo) ---------------- */
+const MOCK_PROFILE = {
+  meta: {
+    nome: 'Rafael', atualizado: '2026-04-18',
+    foco_ativo: ['Claude Agent SDK', 'Managed Agents', 'Context engineering'],
+    identidade: ['SaaS B2B', 'Claude Code power user', 'Obsidian-first', 'Next.js', 'Supabase'],
+    evita: ['geração de vídeo', 'voice cloning', 'benchmarks puros', 'AGI hype'],
+    processadas: 47, favoritadas: 6, thumb_up: 18, thumb_down: 3, acerto: 86
+  },
+  identidade: 'Founder e CTO do **Tomik CRM**, SaaS B2B focado em equipes comerciais enxutas. Constrói também o **AutomatikLabs** e o **GrowthOS**.\n\nStack dominante: Next.js, Supabase, Claude Code, Obsidian como segundo cérebro.',
+  foco: 'Estudando **Claude Agent SDK** e **Managed Agents**. Construindo o próprio Tino como projeto clonável para comunidade educacional.\n\nInteresse imediato em: orquestração de subagents, padrões de context engineering, custo/latência de providers.',
+  evita_body: 'Sem interesse ativo em: geração de vídeo por IA, voice cloning, benchmarks puros sem aplicação, hype de AGI, debates filosóficos sobre consciência de LLMs.'
+};
+const MOCK_CONFIG = { meta: { fontes_ativas: 25, fontes_inativas: 4, frequencia: '1–2× por dia', vault_subpasta: 'Tino' } };
+const MOCK_NEWS = [
+  { id: '2026-04-21-claude-managed-agents', titulo: 'Claude Managed Agents entra em GA', fonte: 'Anthropic Blog', data: '2026-04-21', tipo: 'release', nota: 9.4, veredito: 'Foca', resumo: 'Infra oficial de orquestração multi-agente Claude — aplicável direto ao pipeline que você está construindo no próprio Tino.', cite: 'projetos/tino-ai/arquitetura_backend.md', url: '', favorito: false,
+    body: 'Você está construindo o Tino usando Claude Code como backend de skills e subagents.\nManaged Agents resolve nativamente orquestração, retries e state — o que você ia implementar manualmente na camada de filesystem. Substituição potencial direta de 3-4 skills do Tino por chamadas oficiais.' },
+  { id: '2026-04-20-claude-sdk-1', titulo: 'Claude Agent SDK 1.0 estável', fonte: 'Anthropic Engineering', data: '2026-04-20', tipo: 'release', nota: 9.1, veredito: 'Foca', resumo: 'SDK oficial sai de beta — hooks, custom tools, permissions estabilizados. Você marcou isso como foco de estudo atual.', cite: 'aprendizado/claude-agent-sdk.md · foco ativo', url: '', favorito: false,
+    body: 'Seu vault marca "estudando Claude Agent SDK" em foco-ativo.md. O 1.0 quebra a API em alguns pontos (hooks renomeados, permission mode inverted) — se você ainda não tocou nos exemplos dos últimos 30 dias, vale revisar antes de codar em cima. Bônus: agora suporta Bun nativamente.' },
+  { id: '2026-04-19-vercel-workflow', titulo: 'Vercel Workflow DevKit chega em GA', fonte: 'Vercel Changelog', data: '2026-04-19', tipo: 'release', nota: 8.2, veredito: 'Considera', resumo: 'Workflows duráveis com pause/resume, retries e state. Alternativa ao BullMQ que você tentou no Tomik.', cite: 'tomik-crm/decisoes/fila-webhooks.md · 2026-03-18', url: '', favorito: false,
+    body: 'Seu vault registra tentativa frustrada com BullMQ no Tomik CRM em março. WDK resolve os problemas de state perdida e retries configuráveis que você documentou. Mas: depende de estar na Vercel — o próprio Tino não vai usar (roda local), mas o Tomik sim pode se beneficiar.' },
+  { id: '2026-04-17-langchain-context-spec', titulo: 'Context Engineering Spec v1 publicada', fonte: 'LangChain Blog', data: '2026-04-17', tipo: 'framework', nota: 7.8, veredito: 'Considera', resumo: 'Formalização do que você já pratica empiricamente — nomenclatura comum acelera conversas com a comunidade.', cite: 'circuito-realidade/context-engineering/_INDEX.md', url: '', favorito: false,
+    body: 'Seu vault tem 40+ notas sobre como você organiza contexto para agentes. A spec convergiu em vocabulário próximo ao seu — vale alinhar os termos que você criou com os oficiais antes de publicar seu material.' },
+  { id: '2026-04-18-supabase-realtime', titulo: 'Supabase Realtime Presence v2', fonte: 'Supabase Changelog', data: '2026-04-18', tipo: 'release', nota: 7.1, veredito: 'Considera', resumo: 'API de presença mais performática — aplicável ao módulo de colaboração do Tomik, sem urgência.', cite: 'tomik-crm/bugs/presenca-fantasma.md · status aberto', url: '', favorito: false,
+    body: 'Tomik usa Supabase Realtime para indicadores "quem está vendo este lead". A v2 baixa latência pela metade e resolve o bug de presença fantasma que você registrou. Não é prioridade, mas vale agendar para o próximo ciclo de manutenção.' },
+  { id: '2026-04-16-copilot-workspace', titulo: 'GitHub Copilot Workspace agora suporta agentes customizados', fonte: 'GitHub Blog', data: '2026-04-16', tipo: 'release', nota: 5.1, veredito: 'Ignore', resumo: 'Você não usa Copilot — seu fluxo é Claude Code. Informação de mercado apenas.', cite: '', url: '', favorito: false, body: '' },
+  { id: '2026-04-18-gemini-flash-thinking', titulo: 'Gemini 2.5 Flash ganha modo thinking', fonte: 'Google DeepMind', data: '2026-04-18', tipo: 'release', nota: 4.5, veredito: 'Ignore', resumo: 'Sem projeto ativo em Gemini. Reavaliação sugerida quando for benchmarkar providers.', cite: '', url: '', favorito: false, body: '' },
+  { id: '2026-04-15-openai-audio', titulo: 'OpenAI Realtime API expande áudio para 12 línguas', fonte: 'OpenAI Blog', data: '2026-04-15', tipo: 'release', nota: 3.8, veredito: 'Ignore', resumo: 'Zero projetos seus envolvem áudio. Pode descartar.', cite: '', url: '', favorito: false, body: '' },
+  { id: '2026-04-14-mistral-medium', titulo: 'Mistral Medium 3 quebra benchmarks de matemática', fonte: 'Mistral', data: '2026-04-14', tipo: 'release', nota: 3.2, veredito: 'Ignore', resumo: 'Seu uso atual não é math-heavy. Releva.', cite: '', url: '', favorito: false, body: '' }
+];
+
+/* ---------------- State ---------------- */
+const state = {
+  vaultHandle: null, tinoHandle: null,
+  mode: 'demo', vaultName: null,
+  data: { news: clone(MOCK_NEWS), profile: clone(MOCK_PROFILE), config: clone(MOCK_CONFIG) }
+};
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+/* ---------------- IndexedDB (persistência do handle do vault) ---------------- */
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('tino', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbPut(key, val) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('kv', 'readwrite').objectStore('kv').put(val, key);
+    tx.onsuccess = () => res(); tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbRead(key) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const r = db.transaction('kv', 'readonly').objectStore('kv').get(key);
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function idbRemove(key) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('kv', 'readwrite').objectStore('kv').delete(key);
+    tx.onsuccess = () => res(); tx.onerror = () => rej(tx.error);
+  });
+}
+
+/* ---------------- Markdown parser / serializer ---------------- */
+function parseFrontmatter(text) {
+  const m = String(text || '').match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!m) return { meta: {}, body: text || '' };
+  const meta = {};
+  m[1].split(/\r?\n/).forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx === -1) return;
+    const k = line.slice(0, idx).trim();
+    let v = line.slice(idx + 1).trim();
+    if (!k) return;
+    if (v.startsWith('[') && v.endsWith(']')) {
+      v = v.slice(1, -1).split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+    } else if (v === 'true') v = true;
+    else if (v === 'false') v = false;
+    else if (v !== '' && !isNaN(Number(v))) v = Number(v);
+    else v = v.replace(/^["']|["']$/g, '');
+    meta[k] = v;
+  });
+  return { meta, body: (m[2] || '').trim() };
+}
+function serializeFrontmatter(meta, body) {
+  const lines = Object.entries(meta).map(([k, v]) => {
+    if (Array.isArray(v)) return `${k}: [${v.map(x => typeof x === 'string' && /[,:\[\]]/.test(x) ? `"${x}"` : x).join(', ')}]`;
+    return `${k}: ${v}`;
+  });
+  return `---\n${lines.join('\n')}\n---\n\n${body || ''}`;
+}
+
+/* ---------------- Vault IO ---------------- */
+async function pickVault() {
+  if (!window.showDirectoryPicker) { alert('Seu navegador não suporta File System Access API.\n\nUse Chrome, Edge, Arc ou Brave.'); return; }
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    await connectVaultHandle(handle);
+  } catch (e) { if (e.name !== 'AbortError') console.error(e); }
+}
+
+async function connectVaultHandle(handle) {
+  state.vaultHandle = handle;
+  state.vaultName = handle.name;
+
+  let tinoHandle;
+  try { tinoHandle = await handle.getDirectoryHandle('Tino'); }
+  catch {
+    try { tinoHandle = await handle.getDirectoryHandle('tino'); }
+    catch {
+      const create = confirm(`Não encontrei a pasta "Tino/" no vault "${handle.name}".\n\nCriar agora com estrutura inicial?`);
+      if (!create) return;
+      tinoHandle = await handle.getDirectoryHandle('Tino', { create: true });
+      await seedVault(tinoHandle);
+    }
+  }
+  state.tinoHandle = tinoHandle;
+  state.mode = 'connected';
+
+  try { await idbPut('vaultHandle', handle); } catch (e) { console.warn('não foi possível salvar handle', e); }
+  await loadFromVault();
+  hideBanner();
+  render();
+}
+
+async function seedVault(tinoDir) {
+  const novDir = await tinoDir.getDirectoryHandle('novidades', { create: true });
+  await tinoDir.getDirectoryHandle('favoritos', { create: true });
+  const today = new Date().toISOString().slice(0, 10);
+  const prof = serializeFrontmatter(
+    { nome: 'Seu nome', atualizado: today, foco_ativo: [], identidade: [], evita: [], processadas: 0, favoritadas: 0, thumb_up: 0, thumb_down: 0, acerto: 0 },
+    `## Identidade\nDescreva aqui quem você é profissionalmente.\n\n## Foco ativo\nO que você está estudando ou construindo agora.\n\n## Evita\nTemas que não são relevantes para seu momento.`
+  );
+  await writeFileContent(tinoDir, '_perfil.md', prof);
+  const conf = serializeFrontmatter({ fontes_ativas: 0, fontes_inativas: 0, frequencia: '1x por dia', vault_subpasta: 'Tino' }, '');
+  await writeFileContent(tinoDir, '_config.md', conf);
+  const sample = serializeFrontmatter(
+    { id: 'exemplo-novidade', titulo: 'Exemplo de novidade', fonte: 'Tino', data: today, tipo: 'exemplo', nota: 7.0, veredito: 'Considera', resumo: 'Esta é uma novidade de exemplo gerada pelo setup inicial.', cite: '', url: '', favorito: false },
+    'Rode o comando de refresh do Claude Code para popular esta pasta com novidades reais filtradas pelo seu perfil.'
+  );
+  await writeFileContent(novDir, 'exemplo-novidade.md', sample);
+}
+
+async function writeFileContent(dir, name, content) {
+  const fh = await dir.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();
+  await w.write(content);
+  await w.close();
+}
+
+async function loadFromVault() {
+  const tino = state.tinoHandle;
+  const data = { news: [], profile: clone(MOCK_PROFILE), config: clone(MOCK_CONFIG) };
+
+  try { data.profile = hydrateProfile(await readFile(tino, '_perfil.md')); } catch {}
+  try { data.config = await readFile(tino, '_config.md'); } catch {}
+
+  try {
+    const novDir = await tino.getDirectoryHandle('novidades');
+    data.news = [];
+    for await (const [name, h] of novDir.entries()) {
+      if (h.kind !== 'file' || !name.endsWith('.md')) continue;
+      const file = await h.getFile();
+      const text = await file.text();
+      const parsed = parseFrontmatter(text);
+      data.news.push({
+        id: String(parsed.meta.id || name.replace(/\.md$/, '')),
+        titulo: String(parsed.meta.titulo || '(sem título)'),
+        fonte: String(parsed.meta.fonte || ''),
+        data: String(parsed.meta.data || ''),
+        tipo: String(parsed.meta.tipo || ''),
+        nota: Number(parsed.meta.nota) || 0,
+        veredito: String(parsed.meta.veredito || ''),
+        resumo: String(parsed.meta.resumo || ''),
+        cite: String(parsed.meta.cite || ''),
+        url: String(parsed.meta.url || ''),
+        favorito: parsed.meta.favorito === true,
+        body: parsed.body,
+        _filename: name
+      });
+    }
+    data.news.sort((a, b) => (b.nota - a.nota) || String(b.data).localeCompare(String(a.data)));
+  } catch {}
+
+  state.data = data;
+}
+
+function hydrateProfile(parsed) {
+  const m = parsed.meta || {};
+  const sections = { identidade: '', foco: '', evita_body: '' };
+  const parts = String(parsed.body || '').split(/^##\s+/m);
+  parts.forEach(p => {
+    const [head, ...rest] = p.split(/\r?\n/);
+    const content = rest.join('\n').trim();
+    const h = String(head || '').trim().toLowerCase();
+    if (h.startsWith('identidade')) sections.identidade = content;
+    else if (h.startsWith('foco')) sections.foco = content;
+    else if (h.startsWith('evita')) sections.evita_body = content;
+  });
+  return {
+    meta: {
+      nome: String(m.nome || ''),
+      atualizado: String(m.atualizado || ''),
+      foco_ativo: Array.isArray(m.foco_ativo) ? m.foco_ativo : [],
+      identidade: Array.isArray(m.identidade) ? m.identidade : [],
+      evita: Array.isArray(m.evita) ? m.evita : [],
+      processadas: Number(m.processadas) || 0,
+      favoritadas: Number(m.favoritadas) || 0,
+      thumb_up: Number(m.thumb_up) || 0,
+      thumb_down: Number(m.thumb_down) || 0,
+      acerto: Number(m.acerto) || 0
+    },
+    identidade: sections.identidade || MOCK_PROFILE.identidade,
+    foco: sections.foco || MOCK_PROFILE.foco,
+    evita_body: sections.evita_body || MOCK_PROFILE.evita_body
+  };
+}
+
+async function readFile(dir, name) {
+  const fh = await dir.getFileHandle(name);
+  const file = await fh.getFile();
+  return parseFrontmatter(await file.text());
+}
+
+async function toggleFavorite(newsId) {
+  const item = state.data.news.find(n => n.id === newsId);
+  if (!item) return;
+  item.favorito = !item.favorito;
+  if (state.mode === 'connected' && item._filename) {
+    try {
+      const novDir = await state.tinoHandle.getDirectoryHandle('novidades');
+      const fh = await novDir.getFileHandle(item._filename);
+      const text = await (await fh.getFile()).text();
+      const parsed = parseFrontmatter(text);
+      parsed.meta.favorito = item.favorito;
+      const out = serializeFrontmatter(parsed.meta, parsed.body);
+      const w = await fh.createWritable();
+      await w.write(out); await w.close();
+    } catch (err) { console.error('falha ao escrever no vault', err); }
+  }
+  render();
+}
+
+async function disconnectVault() {
+  if (!confirm('Desconectar o vault? Você volta para o modo demo com dados de exemplo.')) return;
+  try { await idbRemove('vaultHandle'); } catch {}
+  state.vaultHandle = null; state.tinoHandle = null; state.mode = 'demo'; state.vaultName = null;
+  state.data = { news: clone(MOCK_NEWS), profile: clone(MOCK_PROFILE), config: clone(MOCK_CONFIG) };
+  render();
+}
+
+async function tryRestore() {
+  try {
+    const handle = await idbRead('vaultHandle');
+    if (!handle) return;
+    const perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted') {
+      state.vaultHandle = handle; state.vaultName = handle.name;
+      try { state.tinoHandle = await handle.getDirectoryHandle('Tino'); }
+      catch {
+        try { state.tinoHandle = await handle.getDirectoryHandle('tino'); }
+        catch { showBanner('warn', `Pasta Tino/ não encontrada em "${handle.name}".`, 'Selecionar outro vault', pickVault); return; }
+      }
+      state.mode = 'connected';
+      await loadFromVault();
+      render();
+    } else if (perm === 'prompt') {
+      showBanner('warn', `Vault "${handle.name}" salvo. Reautorize o acesso para retomar.`, 'Reconectar', async () => {
+        const p = await handle.requestPermission({ mode: 'readwrite' });
+        if (p === 'granted') { await connectVaultHandle(handle); }
+      });
+    }
+  } catch (err) { console.warn('restore falhou', err); }
+}
+
+/* ---------------- Banner ---------------- */
+function showBanner(kind, text, actionLabel, onClick) {
+  const b = document.getElementById('banner');
+  b.className = 'banner ' + kind;
+  b.style.display = 'flex';
+  document.getElementById('banner-text').textContent = text;
+  const btn = document.getElementById('banner-action');
+  btn.textContent = actionLabel;
+  btn.onclick = onClick;
+}
+function hideBanner() { document.getElementById('banner').style.display = 'none'; }
+
+/* ---------------- Rendering ---------------- */
+function scoreClass(n) { if (n >= 9) return 'high'; if (n >= 7) return 'mid'; return 'low'; }
+function tagClass(v) { const x = String(v || '').toLowerCase(); if (x.startsWith('foca')) return 'focar'; if (x.startsWith('consid')) return 'considera'; if (x.startsWith('acomp')) return 'acompanha'; return 'ignore'; }
+
+function renderStatus() {
+  const s = document.getElementById('status');
+  clear(s);
+  if (state.mode === 'connected') {
+    s.append(
+      el('span', { class: 'dot' }),
+      el('span', { text: `${state.vaultName}/${(state.data.config?.meta?.vault_subpasta) || 'Tino'}` }),
+      el('span', { class: 'sep', text: '·' }),
+      el('span', { text: `${state.data.news.length} novidades` })
+    );
+  } else {
+    s.append(
+      el('span', { class: 'dot mock' }),
+      el('span', { text: 'modo demo' }),
+      el('span', { class: 'sep', text: '·' }),
+      el('button', { class: 'btn-inline', onclick: pickVault, text: 'Conectar vault' })
+    );
+  }
+}
+
+function updateCounts() {
+  const highlights = state.data.news.filter(n => n.nota >= 7).length;
+  document.getElementById('count-today').textContent = String(highlights || state.data.news.length);
+  document.getElementById('count-fav').textContent = String(state.data.news.filter(n => n.favorito).length);
+}
+
+function sectionHead(titlePlainBefore, emphasized, titlePlainAfter, hint) {
+  const h = el('h2');
+  if (titlePlainBefore) h.append(document.createTextNode(titlePlainBefore));
+  if (emphasized) h.append(el('em', { text: emphasized }));
+  if (titlePlainAfter) h.append(document.createTextNode(titlePlainAfter));
+  return el('div', { class: 'section-head' }, h, hint ? el('span', { class: 'hint', text: hint }) : null);
+}
+
+function card(n) {
+  const expandable = Boolean(n.body || n.cite);
+  const scoreDiv = el('div', { class: 'score-col' },
+    el('span', { class: `score ${scoreClass(n.nota)}`, text: Number(n.nota).toFixed(1) }),
+    el('span', { class: 'score-label', text: 'nota' })
+  );
+
+  const body = el('div', { class: 'card-body' },
+    el('h3', { text: n.titulo }),
+    n.fonte ? el('div', { class: 'card-meta' },
+      el('span', { class: 'source', text: n.fonte }),
+      el('span', { class: 'sep', text: '·' }),
+      el('span', { text: `${n.tipo || ''}${n.data ? ' · ' + n.data : ''}` })
+    ) : null,
+    el('p', { class: 'verdict' },
+      el('span', { class: `tag ${tagClass(n.veredito)}`, text: n.veredito }),
+      n.resumo
+    )
+  );
+
+  if (expandable) {
+    const reason = n.body ? el('div', { class: 'reason' },
+      el('div', { class: 'label', text: 'Por que importa para você' }),
+      el('p', { text: n.body }),
+      n.cite ? el('span', { class: 'cite' }, 'Obsidian · ', el('em', { text: n.cite })) : null
+    ) : null;
+
+    const actions = el('div', { class: 'expand-actions' },
+      el('button', { class: 'act primary' + (n.favorito ? ' active' : ''), 'data-fav': n.id, text: n.favorito ? 'Favoritado' : 'Favoritar' }),
+      el('button', { class: 'act thumb up', 'data-thumb': 'up', 'data-id': n.id, text: 'Certeiro' }),
+      el('button', { class: 'act thumb down', 'data-thumb': 'down', 'data-id': n.id, text: 'Errou' }),
+      isSafeUrl(n.url) ? el('a', { class: 'act', href: n.url, target: '_blank', rel: 'noopener', text: 'Abrir fonte' }) : null
+    );
+
+    body.appendChild(el('div', { class: 'expand' }, reason, actions));
+  }
+
+  const actionHint = expandable
+    ? el('div', { class: 'card-action' }, 'expandir ', el('span', { class: 'chev', text: '▾' }))
+    : el('div');
+
+  return el('article', { class: 'card', 'data-id': n.id }, scoreDiv, body, actionHint);
+}
+
+function cardsList(items, extraClass) {
+  const c = el('div', { class: 'cards' + (extraClass ? ' ' + extraClass : '') });
+  items.forEach(n => c.appendChild(card(n)));
+  return c;
+}
+
+function renderToday() {
+  const root = document.getElementById('today');
+  clear(root);
+  const foco = state.data.news.filter(n => n.nota >= 9);
+  const consid = state.data.news.filter(n => n.nota >= 7 && n.nota < 9);
+  const ignore = state.data.news.filter(n => n.nota < 7);
+  const relevantes = foco.length + consid.length;
+  const total = state.data.news.length;
+
+  if (total === 0) {
+    root.appendChild(el('div', { class: 'empty' },
+      el('h2', { text: 'Nenhuma novidade ainda' }),
+      el('p', { text: 'Rode o comando de refresh do seu Claude Code para que o Tino processe as fontes e popule esta visualização.' }),
+      el('div', { class: 'cmd', style: 'display:inline-block;font-size:13px;padding:10px 16px', text: '/tino:refresh' })
+    ));
+    return;
+  }
+
+  root.appendChild(el('div', { class: 'calm' },
+    el('p', null,
+      'Você está em dia. ',
+      el('strong', { text: `${relevantes} ${relevantes === 1 ? 'novidade' : 'novidades'}` }),
+      ` ${relevantes === 1 ? 'merece' : 'merecem'} teu foco hoje de ${total} analisadas. As demais podem ser ignoradas com tranquilidade.`,
+      el('span', { class: 'sub', text: 'Tino lê seu vault Obsidian, monitora suas fontes configuradas e ranqueia o que é realmente relevante para o seu momento.' })
+    )
+  ));
+
+  if (foco.length) { root.appendChild(sectionHead('', 'Focar', ' hoje', 'nota 9+ · altamente aplicável')); root.appendChild(cardsList(foco)); }
+  if (consid.length) { root.appendChild(sectionHead('', 'Considerar', '', 'nota 7–8.9 · relevante contextual')); root.appendChild(cardsList(consid)); }
+  if (ignore.length) { root.appendChild(sectionHead('', 'Ignorar', ' por ora', 'nota < 7 · fora do seu contexto atual')); root.appendChild(cardsList(ignore, 'ignored')); }
+}
+
+function renderFavorites() {
+  const root = document.getElementById('favorites');
+  clear(root);
+  const favs = state.data.news.filter(n => n.favorito);
+  if (!favs.length) {
+    root.appendChild(sectionHead('Seus ', 'favoritos', '', 'tutoriais, casos e comunidade'));
+    root.appendChild(el('div', { class: 'empty' },
+      el('h2', { style: 'font-size:22px', text: 'Nenhum favorito ainda' }),
+      el('p', { text: 'Favoritar uma novidade pede ao seu Claude Code local para gerar o deep-dive completo: tutoriais, casos de uso e resumo do que a comunidade está dizendo.' })
+    ));
+    return;
+  }
+  root.appendChild(sectionHead('Seus ', 'favoritos', '', `${favs.length} ${favs.length === 1 ? 'item salvo' : 'itens salvos'}`));
+  root.appendChild(cardsList(favs));
+}
+
+function renderProfile() {
+  const root = document.getElementById('profile');
+  clear(root);
+  const p = state.data.profile || MOCK_PROFILE;
+  const src = state.mode === 'connected'
+    ? `lido de ${state.vaultName}/Tino/_perfil.md`
+    : 'modo demo · conecte seu vault para ver seu perfil real';
+  root.appendChild(sectionHead('O que o ', 'Tino', ' aprendeu sobre você', src));
+
+  root.appendChild(el('div', { class: 'profile-grid' },
+    el('div', { class: 'profile-card' },
+      el('h3', { text: 'Identidade profissional' }),
+      el('div', { class: 'caption', text: p.meta.atualizado ? 'atualizado ' + p.meta.atualizado : 'seu vault' }),
+      el('p', null, ...mdInline(p.identidade)),
+      el('div', { class: 'chips' }, ...(p.meta.identidade || []).map(c => el('span', { class: 'chip active', text: c })))
+    ),
+    el('div', { class: 'profile-card' },
+      el('h3', { text: 'Foco ativo agora' }),
+      el('div', { class: 'caption', text: 'leitura do seu vault' }),
+      el('p', null, ...mdInline(p.foco)),
+      el('div', { class: 'chips' }, ...(p.meta.foco_ativo || []).map(c => el('span', { class: 'chip active', text: c })))
+    ),
+    el('div', { class: 'profile-card' },
+      el('h3', { text: 'Evita (anti-filtros)' }),
+      el('div', { class: 'caption', text: 'inferido de thumbs down + notas descartadas' }),
+      el('p', null, ...mdInline(p.evita_body)),
+      el('div', { class: 'chips' }, ...(p.meta.evita || []).map(c => el('span', { class: 'chip', text: c })))
+    ),
+    el('div', { class: 'profile-card' },
+      el('h3', { text: 'Sinais coletados' }),
+      el('div', { class: 'caption', text: 'desde a instalação' }),
+      el('p', null,
+        el('strong', { text: String(p.meta.processadas || 0) }), ' processadas · ',
+        el('strong', { text: String(p.meta.favoritadas || 0) }), ' favoritadas · ',
+        el('strong', { text: String(p.meta.thumb_up || 0) }), ' certeiros · ',
+        el('strong', { text: String(p.meta.thumb_down || 0) }), ' errados'
+      ),
+      p.meta.acerto ? el('p', null,
+        'Taxa de acerto do ranking: ',
+        el('strong', { style: 'color:var(--high)', text: `${p.meta.acerto}%` })
+      ) : null
+    )
+  ));
+}
+
+function renderSettings() {
+  const root = document.getElementById('settings');
+  clear(root);
+  const connected = state.mode === 'connected';
+  const cfg = (state.data.config && state.data.config.meta) || {};
+
+  root.appendChild(sectionHead('', 'Configurações', ' locais', 'tudo roda no seu Claude Code · zero backend'));
+
+  function row(kTitle, kHelp, valueChildren) {
+    return el('div', { class: 'setting-row' },
+      el('div', { class: 'k' }, kTitle, el('small', { text: kHelp })),
+      el('div', { class: 'v' }, ...(Array.isArray(valueChildren) ? valueChildren : [valueChildren]))
+    );
+  }
+
+  const vaultValue = connected
+    ? [ el('code', { class: 'cmd', text: state.vaultName }), el('button', { class: 'btn-inline danger', onclick: disconnectVault, text: 'Desconectar' }) ]
+    : [ el('button', { class: 'btn-inline', onclick: pickVault, text: 'Conectar vault' }) ];
+
+  root.appendChild(row('Vault Obsidian', connected ? 'conectado, leitura e escrita autorizadas' : 'nenhum vault conectado — modo demo ativo', vaultValue));
+  root.appendChild(row('Subpasta lida pelo dashboard', 'o Tino só lê e escreve dentro dessa pasta', el('code', { class: 'cmd', text: `${cfg.vault_subpasta || 'Tino'}/` })));
+  root.appendChild(row('Fontes monitoradas', `edite em ${cfg.vault_subpasta || 'Tino'}/_config.md`, document.createTextNode(`${cfg.fontes_ativas || 0} ativas · ${cfg.fontes_inativas || 0} desativadas`)));
+  root.appendChild(row('Comando de refresh', 'rode no terminal dentro da pasta do projeto Tino', el('code', { class: 'cmd', text: '/tino:refresh' })));
+  root.appendChild(row('Frequência sugerida', 'o Claude Code não agenda sozinho — você chama quando quiser', document.createTextNode(String(cfg.frequencia || '1–2× por dia'))));
+  root.appendChild(row('Regenerar dashboard', 'não é preciso — este HTML lê o vault ao vivo', el('code', { class: 'cmd', text: 'F5' })));
+
+  function docBlock(title, pre) {
+    const d = el('details', null, el('summary', { text: title }));
+    const p = el('pre'); p.textContent = pre; d.appendChild(p);
+    return d;
+  }
+
+  root.appendChild(docBlock('Estrutura esperada dentro do vault',
+`{seu-vault}/
+  └── Tino/
+      ├── _perfil.md          (identidade + foco + evita)
+      ├── _config.md          (fontes, preferências)
+      ├── novidades/
+      │   ├── 2026-04-21-claude-managed-agents.md
+      │   ├── 2026-04-20-claude-sdk-1.md
+      │   └── ...             (um arquivo .md por novidade)
+      └── favoritos/          (opcional — Tino popula ao favoritar)`));
+
+  root.appendChild(docBlock('Formato de uma novidade (.md)',
+`---
+id: 2026-04-21-claude-managed-agents
+titulo: Claude Managed Agents entra em GA
+fonte: Anthropic Blog
+data: 2026-04-21
+tipo: release
+nota: 9.4
+veredito: Foca
+resumo: Infra oficial de orquestração multi-agente Claude...
+cite: projetos/tino-ai/arquitetura_backend.md
+url: https://www.anthropic.com/news/managed-agents
+favorito: false
+---
+
+Você está construindo o Tino usando Claude Code como backend...
+(justificativa personalizada que aparece no dashboard)`));
+
+  root.appendChild(docBlock('Formato do _perfil.md',
+`---
+nome: Rafael
+atualizado: 2026-04-18
+foco_ativo: [Claude Agent SDK, Managed Agents, Context engineering]
+identidade: [SaaS B2B, Claude Code power user, Obsidian-first]
+evita: [geração de vídeo, AGI hype]
+processadas: 47
+favoritadas: 6
+thumb_up: 18
+thumb_down: 3
+acerto: 86
+---
+
+## Identidade
+Founder e CTO do **Tomik CRM**...
+
+## Foco ativo
+Estudando **Claude Agent SDK**...
+
+## Evita
+Sem interesse ativo em...`));
+}
+
+function wireCards() {
+  document.querySelectorAll('.card').forEach(c => {
+    c.addEventListener('click', (e) => {
+      if (e.target.closest('.act') || e.target.closest('a')) return;
+      c.classList.toggle('expanded');
+    });
+  });
+  document.querySelectorAll('[data-fav]').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(btn.getAttribute('data-fav')); });
+  });
+  document.querySelectorAll('[data-thumb]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasActive = btn.classList.contains('active');
+      btn.parentElement.querySelectorAll('[data-thumb]').forEach(s => s.classList.remove('active'));
+      if (!wasActive) btn.classList.add('active');
+    });
+  });
+}
+
+function render() {
+  renderStatus();
+  renderToday();
+  renderFavorites();
+  renderProfile();
+  renderSettings();
+  wireCards();
+  updateCounts();
+}
+
+/* TABS */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.getAttribute('data-view')).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}));
+
+/* BOOT */
+(async () => { render(); await tryRestore(); })();
+</script>
+
+</body>
+</html>
