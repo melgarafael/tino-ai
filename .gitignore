@@ -6,3 +6,7 @@ node_modules/
 test-results/
 playwright-report/
 dashboard-data.json
+.playwright-mcp/
+# screenshots de dev
+*.png
+!tino-vault-sample/**/*.png

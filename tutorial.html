@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tino — tutorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #13110f;
+    --bg-elev: #1a1815;
+    --bg-card: #181613;
+    --text: #eae3d2;
+    --text-dim: #9a9186;
+    --text-faint: #6a6359;
+    --accent: #d4a24c;
+    --accent-dim: #8a6c34;
+    --border: #2a2620;
+    --border-soft: #211e1a;
+    --high: #8fb174;
+    --danger: #b76454;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-dim); }
+  a:hover { color: var(--text); border-color: var(--text); }
+  code, pre { font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace; }
+  code { font-size: 0.88em; background: var(--bg-elev); padding: 2px 6px; border-radius: 3px; color: var(--accent); border: 1px solid var(--border); }
+  pre { background: #0b0a09; border: 1px solid var(--border); border-radius: 4px; padding: 18px 22px; overflow-x: auto; font-size: 13px; line-height: 1.7; margin: 18px 0; }
+  pre code { background: none; padding: 0; border: 0; color: var(--text); font-size: inherit; }
+  pre .cmt { color: var(--text-faint); }
+  pre .cmd { color: var(--accent); }
+  pre .str { color: var(--high); }
+
+  .layout { display: grid; grid-template-columns: 260px 1fr; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
+
+  aside { border-right: 1px solid var(--border); padding: 40px 24px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  aside .brand { font-family: 'Newsreader', serif; font-weight: 500; font-style: italic; font-size: 32px; letter-spacing: -0.02em; margin-bottom: 4px; }
+  aside .brand::after { content: '.'; color: var(--accent); }
+  aside .subtitle { font-size: 12px; color: var(--text-faint); margin-bottom: 32px; letter-spacing: 0.02em; }
+  aside nav { display: flex; flex-direction: column; gap: 2px; }
+  aside nav a { border: 0; padding: 7px 12px; border-radius: 3px; color: var(--text-dim); font-size: 13px; transition: background .1s, color .1s; }
+  aside nav a:hover { background: var(--bg-elev); color: var(--text); }
+  aside nav a.active { background: var(--bg-elev); color: var(--accent); }
+  aside nav .group { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin: 20px 0 6px; padding: 0 12px; font-weight: 600; }
+  aside .back { margin-top: 40px; padding: 12px 16px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; text-align: center; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  aside .back:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+  main { padding: 64px 56px 120px; max-width: 860px; }
+  main section { margin-bottom: 72px; }
+  main section:last-child { margin-bottom: 0; }
+
+  h1 { font-family: 'Newsreader', serif; font-weight: 500; font-size: 58px; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 16px; }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
+  h2 { font-family: 'Newsreader', serif; font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -0.012em; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border-soft); }
+  h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  h3 { font-family: 'Newsreader', serif; font-weight: 500; font-size: 22px; letter-spacing: -0.005em; margin-top: 32px; margin-bottom: 12px; }
+  h3 em { font-style: italic; color: var(--accent); }
+  p { margin-bottom: 16px; color: var(--text); }
+  .lead { font-family: 'Newsreader', serif; font-size: 22px; line-height: 1.5; color: var(--text-dim); margin-bottom: 40px; font-weight: 400; }
+  .lead em { font-style: italic; color: var(--text); }
+
+  ul, ol { margin: 16px 0 20px 24px; color: var(--text-dim); }
+  ul li, ol li { padding: 4px 0; }
+  ul li strong, ol li strong { color: var(--text); font-weight: 500; }
+
+  .callout { background: rgba(212,162,76,0.04); border-left: 2px solid var(--accent-dim); padding: 16px 22px; margin: 24px 0; border-radius: 0 4px 4px 0; color: var(--text-dim); font-size: 14px; }
+  .callout strong { color: var(--accent); font-weight: 500; }
+  .callout.warn { background: rgba(183,100,84,0.06); border-left-color: var(--danger); }
+  .callout.warn strong { color: var(--danger); }
+  .callout.ok { background: rgba(143,177,116,0.06); border-left-color: var(--high); }
+  .callout.ok strong { color: var(--high); }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  table th, table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-soft); }
+  table th { font-family: 'Newsreader', serif; font-weight: 500; color: var(--accent); font-size: 14px; border-bottom: 1px solid var(--border); }
+  table td { color: var(--text-dim); }
+  table td code { font-size: 12px; }
+
+  .pipeline { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 4px; padding: 28px 32px; margin: 24px 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 2; color: var(--text-dim); overflow-x: auto; }
+  .pipeline .label { color: var(--accent); font-weight: 500; }
+  .pipeline .arrow { color: var(--text-faint); margin: 0 6px; }
+
+  .step { display: grid; grid-template-columns: 48px 1fr; gap: 20px; align-items: start; margin: 28px 0; padding: 20px 0; border-bottom: 1px solid var(--border-soft); }
+  .step:last-child { border-bottom: 0; }
+  .step .num { font-family: 'Newsreader', serif; font-style: italic; font-size: 38px; line-height: 1; color: var(--accent); font-weight: 500; text-align: right; }
+  .step .body h3 { margin-top: 0; }
+  .step .body p:last-child { margin-bottom: 0; }
+
+  footer { margin-top: 100px; padding-top: 32px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  footer em { font-family: 'Newsreader', serif; font-style: italic; color: var(--text-dim); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 28px 24px; }
+    aside nav { flex-direction: row; flex-wrap: wrap; }
+    aside .back { display: none; }
+    main { padding: 40px 24px 80px; }
+    h1 { font-size: 42px; }
+    h2 { font-size: 26px; }
+    .lead { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<aside>
+  <div class="brand">Tino</div>
+  <div class="subtitle">tutorial de uso</div>
+  <nav id="toc">
+    <div class="group">Começar</div>
+    <a href="#hero">Sobre o Tino</a>
+    <a href="#arquitetura">Arquitetura</a>
+    <a href="#requisitos">Pré-requisitos</a>
+    <a href="#instalar">Instalação</a>
+
+    <div class="group">Fluxo diário</div>
+    <a href="#primeiro-uso">Primeiro uso</a>
+    <a href="#setup">/tino:setup</a>
+    <a href="#refresh">/tino:refresh</a>
+    <a href="#dashboard">O dashboard</a>
+    <a href="#vault">Conectar vault</a>
+
+    <div class="group">Avançado</div>
+    <a href="#ranking">Como o ranking funciona</a>
+    <a href="#fontes">Customizar fontes</a>
+    <a href="#feedback">Feedback loop</a>
+    <a href="#deep-dive">/tino:deep-dive</a>
+    <a href="#profile-sync">/tino:profile-sync</a>
+
+    <div class="group">Referência</div>
+    <a href="#faq">FAQ / troubleshooting</a>
+    <a href="#privacidade">Privacidade</a>
+    <a href="#desinstalar">Desinstalar</a>
+  </nav>
+  <a class="back" href="dashboard.html">← voltar ao dashboard</a>
+</aside>
+
+<main>
+
+<section id="hero">
+  <h1>Tutorial do <em>Tino</em></h1>
+  <p class="lead">Um curador de novidades de IA que roda <em>100% na sua máquina</em>, lê o seu vault Obsidian, e só te mostra o que realmente importa pro teu momento — hoje.</p>
+  <p>Este guia leva do <strong>git clone</strong> até o primeiro refresh populado com novidades ranqueadas do teu jeito. Menos de 10 minutos no total.</p>
+</section>
+
+<section id="arquitetura">
+  <h2>Como o Tino <em>funciona</em> por baixo</h2>
+  <p>Três peças, todas locais:</p>
+  <ol>
+    <li><strong>Claude Code</strong> é o backend. Skills, agents e prompts vivem em <code>.claude/</code>. Não tem servidor, não tem API.</li>
+    <li><strong>Teu vault Obsidian</strong> é o banco de dados. O Tino lê o vault inteiro como contexto e escreve de volta numa pasta dedicada <code>Tino/</code>.</li>
+    <li><strong>dashboard.html</strong> é um single-file HTML que lê <code>Tino/novidades/</code> via File System Access API. Zero build, zero deploy.</li>
+  </ol>
+
+  <h3>Fluxo de dados</h3>
+  <div class="pipeline">
+<span class="label">setup</span>   <span class="arrow">›</span> scaneia vault inteiro <span class="arrow">→</span> escreve <code>Tino/_perfil.md</code>
+<span class="label">refresh</span> <span class="arrow">›</span> lê perfil + coleta RSS <span class="arrow">→</span> escreve <code>Tino/novidades/*.md</code>
+<span class="label">dashboard</span> <span class="arrow">›</span> lê <code>Tino/novidades/</code> <span class="arrow">→</span> renderiza UI
+<span class="label">thumbs-down</span> <span class="arrow">›</span> escreve <code>Tino/_ajustes.md</code> <span class="arrow">→</span> treina o próximo ranking
+  </div>
+
+  <div class="callout">
+    <strong>Importante.</strong> O dashboard é apenas visor. Conectar o vault no dashboard <em>não dispara o pipeline</em> — só mostra o que o <code>tino refresh</code> já escreveu lá. Se nunca rodou refresh pro vault, o dashboard fica vazio.
+  </div>
+</section>
+
+<section id="requisitos">
+  <h2>Pré-<em>requisitos</em></h2>
+  <table>
+    <thead><tr><th>Item</th><th>Versão</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Code</td><td>recente</td><td>Runtime dos comandos <code>/tino:*</code></td></tr>
+      <tr><td>Node.js</td><td>20+</td><td>Scripts CLI ESM, <code>node --test</code> nativo</td></tr>
+      <tr><td>Python 3</td><td>3.8+</td><td>Serve <code>dashboard.html</code> estático</td></tr>
+      <tr><td>Chrome / Edge / Arc / Brave</td><td>recente</td><td>Dashboard usa File System Access API (Chromium-only)</td></tr>
+      <tr><td>Vault Obsidian</td><td>qualquer</td><td>Pasta com <code>.md</code> — Obsidian não é obrigatório</td></tr>
+    </tbody>
+  </table>
+  <p>Firefox e Safari <strong>não funcionam</strong> com o dashboard em modo connected. O modo demo funciona em qualquer browser.</p>
+</section>
+
+<section id="instalar">
+  <h2><em>Instalação</em> em 4 passos</h2>
+
+  <div class="step">
+    <div class="num">1</div>
+    <div class="body">
+      <h3>Clone o repo</h3>
+<pre><code><span class="cmd">git clone</span> https://github.com/melgarafael/tino-ai.git
+<span class="cmd">cd</span> tino-ai</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">2</div>
+    <div class="body">
+      <h3>Instale as deps do Node</h3>
+<pre><code><span class="cmd">npm install</span></code></pre>
+      <p>São duas: <code>fast-xml-parser</code> (RSS) e <code>yaml</code> (config). Sem bundler, sem framework.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">3</div>
+    <div class="body">
+      <h3>Instale o Tino globalmente</h3>
+<pre><code><span class="cmd">bash</span> install.sh</code></pre>
+      <p>O script:</p>
+      <ul>
+        <li>Symlinka <code>bin/tino</code> → <code>~/.local/bin/tino</code> (entra no PATH)</li>
+        <li>Symlinka <code>.claude/commands/tino-*.md</code> → <code>~/.claude/commands/</code> (slash commands funcionam em qualquer projeto do Claude Code)</li>
+        <li>Symlinka os 3 agents</li>
+        <li>Salva <code>TINO_HOME</code> em <code>~/.tino/config.sh</code></li>
+      </ul>
+      <p>Tudo reversível via <code>uninstall.sh</code>. Nenhum arquivo do teu vault é tocado.</p>
+      <div class="callout warn">
+        <strong>PATH.</strong> Se <code>~/.local/bin</code> não está no teu <code>$PATH</code>, o install avisa. Adicione ao teu shell rc:
+<pre style="margin:8px 0 0"><code>export PATH="$HOME/.local/bin:$PATH"</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">4</div>
+    <div class="body">
+      <h3>(opcional) Chromium para testes E2E</h3>
+<pre><code><span class="cmd">npx playwright install chromium</span></code></pre>
+      <p>Só se quiser rodar <code>npm run test:e2e</code>. Se o plano for só usar, pode pular.</p>
+    </div>
+  </div>
+</section>
+
+<section id="primeiro-uso">
+  <h2>Primeiro <em>uso</em></h2>
+  <p>Depois do install, você tem duas formas equivalentes de invocar o Tino:</p>
+  <ul>
+    <li><strong>Slash commands</strong> dentro do Claude Code (funcionam de qualquer pasta): <code>/tino:setup</code>, <code>/tino:refresh</code>, <code>/tino:profile-sync</code>, <code>/tino:deep-dive</code></li>
+    <li><strong>CLI direto</strong> do terminal: <code>tino setup</code>, <code>tino refresh</code>, <code>tino dashboard:open</code></li>
+  </ul>
+</section>
+
+<section id="setup">
+  <h2><code>/tino:setup</code> — extração do <em>perfil</em></h2>
+  <p>Primeira coisa a rodar. Cria a pasta <code>Tino/</code> dentro do seu vault e sintetiza um perfil a partir do conteúdo do vault.</p>
+<pre><code><span class="cmd">tino setup</span> --vault <span class="str">"/Users/voce/Documents/MeuVault"</span> --mock --force</code></pre>
+  <p>O que acontece:</p>
+  <ol>
+    <li><strong>Scanner heurístico</strong> percorre o vault recursivo e pontua arquivos por 6 sinais: nome (README/sobre/perfil/foco/CLAUDE/_INDEX), profundidade, recência, backlinks, tags no frontmatter, tamanho em palavras.</li>
+    <li>Seleciona os top-<code>N</code> (default 30, ajuste com <code>--top 50</code>).</li>
+    <li>Em <strong>modo mock</strong> aplica heurística determinística. Em <strong>modo real</strong> (dentro do Claude Code) o agent <code>profile-extractor</code> lê esses arquivos e sintetiza.</li>
+    <li>Escreve rascunho em <code>{vault}/Tino/_perfil.md</code> com identidade, foco ativo, evita.</li>
+  </ol>
+  <p>Abra <code>{vault}/Tino/_perfil.md</code> no Obsidian e <strong>revise</strong>. Esse arquivo é o coração do ranking — menos é mais, seja específico.</p>
+  <div class="callout">
+    <strong>Exemplo de perfil bem calibrado.</strong> <code>foco_ativo: [Claude Agent SDK, Managed Agents, Context engineering]</code> é melhor que <code>foco_ativo: [AI, machine learning, tools]</code>. Termos específicos alimentam o matcher do ranker.
+  </div>
+</section>
+
+<section id="refresh">
+  <h2><code>/tino:refresh</code> — coletar e <em>ranquear</em></h2>
+<pre><code><span class="cmd">tino refresh</span> --vault <span class="str">"/Users/voce/Documents/MeuVault"</span> --mock --force</code></pre>
+  <p>Pipeline:</p>
+  <ol>
+    <li><strong>Fetch</strong> das fontes em <code>config/sources.default.yaml</code> (20 feeds por default: Anthropic, OpenAI, Vercel, Supabase, HF, LangChain, Simon Willison, HN, Reddit, arXiv, …).</li>
+    <li><strong>Normaliza</strong> cada item em um schema comum <code>{id, titulo, fonte, data, url, resumo_bruto}</code>.</li>
+    <li><strong>Ranqueia</strong> item por item contra o perfil. Cada novidade vira um <code>.md</code> em <code>{vault}/Tino/novidades/</code> com frontmatter estruturado + corpo com a justificativa ("por que importa para você").</li>
+    <li><strong>Incrementa counter</strong> em <code>_config.md</code>. Ao atingir 20 refreshes, sugere rodar <code>/tino:profile-sync</code>.</li>
+  </ol>
+
+  <p>Flags úteis:</p>
+  <table>
+    <thead><tr><th>Flag</th><th>Efeito</th></tr></thead>
+    <tbody>
+      <tr><td><code>--mock</code></td><td>Ranker determinístico (heurística). Sem Claude. Bom pra testar.</td></tr>
+      <tr><td><code>--force</code></td><td>Ignora cache do dia e re-fetcha</td></tr>
+      <tr><td><code>--fixture-dir</code> <em>&lt;path&gt;</em></td><td>Usa fixtures locais em vez de HTTP (offline/testes)</td></tr>
+      <tr><td><code>--limit</code> <em>&lt;N&gt;</em></td><td>Máximo de items por fonte (default 20)</td></tr>
+      <tr><td><code>--since</code> <em>&lt;ISO&gt;</em></td><td>Ignora items mais antigos que essa data</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="dashboard">
+  <h2>Abrindo o <em>dashboard</em></h2>
+<pre><code><span class="cmd">tino dashboard:open</span> --vault <span class="str">"/Users/voce/Documents/MeuVault"</span></code></pre>
+  <p>Esse comando:</p>
+  <ol>
+    <li>Gera <code>dashboard-data.json</code> a partir do vault</li>
+    <li>Sobe um HTTP server local em <code>127.0.0.1:8080</code> (se não tiver um rodando)</li>
+    <li>Abre o browser</li>
+  </ol>
+
+  <p>Três estados possíveis do dashboard:</p>
+  <ul>
+    <li><strong>Demo genérico</strong> — abriu direto sem ter rodado refresh em vault nenhum. Mostra 9 cards de exemplo hardcoded.</li>
+    <li><strong>Demo com dados reais</strong> — o <code>tino dashboard:open</code> dumpou <code>dashboard-data.json</code> do vault. Dashboard renderiza as novidades reais já ranqueadas. Sem precisar conectar o vault.</li>
+    <li><strong>Connected live</strong> — você clicou "Conectar vault" no topo e apontou pra pasta raiz do seu vault. Dashboard lê <code>Tino/novidades/</code> ao vivo, e favoritar/thumbs-down reescrevem os <code>.md</code>.</li>
+  </ul>
+</section>
+
+<section id="vault">
+  <h2><em>Conectar</em> o vault no dashboard</h2>
+  <p>Passos:</p>
+  <ol>
+    <li>Clique em <strong>Conectar vault</strong> no topo direito.</li>
+    <li>No seletor de pasta, escolha a <strong>raiz do seu vault Obsidian</strong> — não a subpasta Tino/. Ex: <code>/Users/voce/Documents/MeuVault</code>.</li>
+    <li>Autorize leitura e escrita. O Tino só lê/escreve dentro de <code>&lt;vault&gt;/Tino/</code>.</li>
+    <li>Se <code>Tino/</code> não existir, o dashboard oferece criar a estrutura.</li>
+  </ol>
+
+  <div class="callout ok">
+    <strong>Browser lembra do vault.</strong> O handle é salvo em IndexedDB. Na próxima vez que abrir o dashboard, ele re-pede permissão (um clique) e reconecta automaticamente.
+  </div>
+
+  <div class="callout warn">
+    <strong>Dashboard conectado mas vazio?</strong> É porque a pasta <code>&lt;vault&gt;/Tino/novidades/</code> está vazia. Rode <code>tino refresh --vault &lt;path&gt; --mock --force</code> no terminal. O empty state do dashboard mostra um diagnóstico detalhado do que foi encontrado.
+  </div>
+</section>
+
+<section id="ranking">
+  <h2>Como o <em>ranking</em> funciona</h2>
+  <p>Cada novidade recebe uma nota 0-10 e um veredito:</p>
+  <table>
+    <thead><tr><th>Nota</th><th>Veredito</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td>9.0–10.0</td><td>Foca</td><td>Altamente aplicável. Menciona item de <code>foco_ativo</code> ou resolve problema conhecido do vault.</td></tr>
+      <tr><td>7.0–8.9</td><td>Considera</td><td>Relevante mas não urgente.</td></tr>
+      <tr><td>5.0–6.9</td><td>Acompanha</td><td>Interessante, fora do momento.</td></tr>
+      <tr><td>&lt; 5.0</td><td>Ignore</td><td>Fora do contexto ou em <code>evita</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Modo mock (default)</h3>
+  <p>Heurística determinística em <code>lib/rank-mock.mjs</code>. Score base 5.0, ajustado por:</p>
+  <ul>
+    <li><strong>+3.0</strong> por match em <code>foco_ativo</code> (cap +6)</li>
+    <li><strong>+1.5</strong> por match em <code>identidade</code> (cap +3)</li>
+    <li><strong>-4.0</strong> por match em <code>evita</code></li>
+    <li><strong>-1.5</strong> por match com tokens de items com thumbs-down</li>
+    <li><strong>+1.0</strong> se publicado nos últimos 7 dias</li>
+    <li>Clip [0, 10], 1 casa decimal.</li>
+  </ul>
+
+  <h3>Modo real (Claude)</h3>
+  <p>Dentro do Claude Code, o agent <code>ranker</code> usa o prompt canônico em <code>config/prompts/rank-novelty.md</code> pra ler perfil + item e produzir um JSON <code>{nota, veredito, resumo, justificativa, cite}</code>. A justificativa sempre cita um arquivo do vault que motivou a nota — auditável.</p>
+</section>
+
+<section id="fontes">
+  <h2>Customizando as <em>fontes</em></h2>
+  <p>20 fontes padrão vivem em <code>config/sources.default.yaml</code> (Anthropic News, OpenAI, DeepMind, Vercel, Supabase, HF, LangChain, Mistral, Simon Willison, HN, Reddit r/LocalLLaMA, r/ClaudeAI, arXiv cs.AI, Cohere, Latent Space, Import AI, Ben's Bites, The Rundown, HF Papers, GitHub trending).</p>
+
+  <p>Pra adicionar/remover, edite <code>{vault}/Tino/_config.md</code>:</p>
+<pre><code>---
+frequencia: 1-2x por dia
+---
+
+## Fontes
+- minha_fonte_custom    https://example.com/feed.xml
+- outra_fonte           https://site.dev/rss</code></pre>
+  <p>Na próxima refresh, o Tino dá merge do <code>_config.md</code> com o default. Fontes do vault ganham prioridade.</p>
+</section>
+
+<section id="feedback">
+  <h2>Feedback loop — <em>afinando</em> o ranking</h2>
+  <p>Cada card tem três botões: <strong>Favoritar</strong>, <strong>Certeiro</strong>, <strong>Errou</strong>.</p>
+  <ul>
+    <li><strong>Favoritar</strong> marca <code>favorito: true</code> no <code>.md</code> da novidade. Desbloqueia <code>/tino:deep-dive</code>.</li>
+    <li><strong>Certeiro</strong> grava em <code>&lt;vault&gt;/Tino/_ajustes.md</code> (seção <code>## Certeiros</code>) e incrementa <code>thumb_up</code>.</li>
+    <li><strong>Errou</strong> grava em <code>## Errados</code> e incrementa <code>thumb_down</code>. <strong>Tokens</strong> do título entram no blacklist temporário do ranker.</li>
+  </ul>
+
+  <p>Na próxima <code>tino refresh</code>, o ranker lê <code>_ajustes.md</code> e penaliza novidades novas que compartilhem tokens com os thumbed-down. Loop de treino honesto, local, inspecionável no próprio Obsidian.</p>
+
+  <div class="callout">
+    <strong>Decisão arquitetural consciente.</strong> Thumbs-down <em>não reescreve</em> o <code>_perfil.md</code> automaticamente. O sinal fica em <code>_ajustes.md</code> — você decide se promove algo pra <code>evita</code> no perfil.
+  </div>
+</section>
+
+<section id="deep-dive">
+  <h2><code>/tino:deep-dive</code> — <em>enriquecendo</em> favoritos</h2>
+  <p>Só funciona em items com <code>favorito: true</code> (controle de custo — deep-dive é caro em tokens se rodado em modo real).</p>
+<pre><code><span class="cmd">tino deep-dive</span> --vault <span class="str">"/Users/voce/Documents/MeuVault"</span> --id <span class="str">"claude-agent-sdk-1-0"</span> --mock</code></pre>
+  <p>Escreve <code>&lt;vault&gt;/Tino/favoritos/&lt;id&gt;-deep-dive.md</code> com 3 seções:</p>
+  <ul>
+    <li><strong>Tutoriais de uso</strong> — passo-a-passo de como experimentar</li>
+    <li><strong>Casos de sucesso</strong> — como outros usaram na prática</li>
+    <li><strong>O que a comunidade está falando</strong> — sentimento + críticas</li>
+  </ul>
+</section>
+
+<section id="profile-sync">
+  <h2><code>/tino:profile-sync</code> — <em>atualizando</em> o perfil</h2>
+  <p>Teu foco muda. Projetos entram e saem. A cada 20 refreshes o Tino sugere rodar:</p>
+<pre><code><span class="cmd">tino profile-sync</span> --vault <span class="str">"/Users/voce/Documents/MeuVault"</span> --mock</code></pre>
+  <p>Faz:</p>
+  <ol>
+    <li>Backup do <code>_perfil.md</code> atual em <code>_perfil.backup-&lt;timestamp&gt;.md</code></li>
+    <li>Re-escaneia o vault, regenera o perfil</li>
+    <li><strong>Preserva</strong> contadores (<code>processadas</code>, <code>favoritadas</code>, <code>thumb_up/down</code>, <code>acerto</code>)</li>
+    <li>Reseta o counter de refreshes pra 0</li>
+  </ol>
+  <p>Use <code>--dry-run</code> pra ver o diff antes de escrever.</p>
+</section>
+
+<section id="faq">
+  <h2>FAQ &amp; <em>Troubleshooting</em></h2>
+
+  <h3>Conectei o vault no dashboard e ficou vazio</h3>
+  <p>Significa que <code>&lt;vault&gt;/Tino/novidades/</code> não tem <code>.md</code>. Rode <code>tino refresh --vault &lt;path&gt; --mock --force</code>. O empty state do dashboard mostra um diagnóstico detalhado.</p>
+
+  <h3>Ranker tá dando "Acompanha" pra tudo</h3>
+  <p>Perfil pouco calibrado. Abra <code>&lt;vault&gt;/Tino/_perfil.md</code> e certifique-se que <code>foco_ativo</code>, <code>identidade</code> e <code>evita</code> estão preenchidos com termos específicos. Depois rode <code>tino refresh --force</code>.</p>
+
+  <h3><code>tino: command not found</code></h3>
+  <p>Adicione <code>~/.local/bin</code> ao PATH:</p>
+<pre><code>export PATH="$HOME/.local/bin:$PATH"</code></pre>
+  <p>Ou rode <code>bash install.sh</code> de novo.</p>
+
+  <h3>Erro "Firefox não suporta File System Access API"</h3>
+  <p>Correto. Use Chrome, Edge, Arc ou Brave pro modo connected. Modo demo funciona em qualquer browser.</p>
+
+  <h3>Posso apontar pra um vault qualquer que não seja Obsidian?</h3>
+  <p>Sim. Qualquer pasta com <code>.md</code> serve. O scanner não depende do Obsidian.</p>
+
+  <h3>Meu vault tem 5000+ notas e o scan tá lento</h3>
+  <p>Use <code>--top 30</code> (default) ou menos. O scanner ignora por default <code>.obsidian/</code>, <code>Tino/</code>, <code>.git/</code>, <code>node_modules/</code>.</p>
+</section>
+
+<section id="privacidade">
+  <h2><em>Privacidade</em> by design</h2>
+  <ul>
+    <li><strong>Zero telemetria.</strong> Nada sai da tua máquina exceto os HTTP GET para os feeds RSS que tu mesmo configurou.</li>
+    <li><strong>Zero conta, zero API key.</strong> Só precisa do Claude Code (que tu já tem).</li>
+    <li><strong>Vault é read-only</strong> pro Tino <em>fora</em> da pasta <code>Tino/</code>. O Tino só escreve dentro da sua própria subpasta.</li>
+    <li><strong>Dashboard não tem backend.</strong> HTML estático servido em loopback. Nenhuma requisição externa exceto CDN de fontes (Google Fonts).</li>
+  </ul>
+</section>
+
+<section id="desinstalar">
+  <h2>Desinstalando</h2>
+<pre><code><span class="cmd">bash</span> ~/tino-ai/uninstall.sh</code></pre>
+  <p>Remove os symlinks (<code>~/.claude/commands/tino-*.md</code>, <code>~/.claude/agents/</code>, <code>~/.local/bin/tino</code>) e <code>~/.tino/config.sh</code>. Repo e vault ficam intactos. Pra remover a pasta <code>Tino/</code> do seu vault, delete manualmente — o Tino nunca faz isso sozinho.</p>
+</section>
+
+<footer>
+  <span>Tino · <em>ter tino é ter discernimento</em></span>
+  <span><a href="https://github.com/melgarafael/tino-ai">github.com/melgarafael/tino-ai</a></span>
+</footer>
+
+</main>
+</div>
+
+<script>
+  // Highlight TOC ativo baseado no scroll
+  const sections = Array.from(document.querySelectorAll('main section[id]'));
+  const links = Array.from(document.querySelectorAll('#toc a[href^="#"]'));
+  const byId = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+
+  function updateActive() {
+    const y = window.scrollY + 120;
+    let active = sections[0];
+    for (const s of sections) {
+      if (s.offsetTop <= y) active = s;
+    }
+    links.forEach(a => a.classList.remove('active'));
+    if (active && byId[active.id]) byId[active.id].classList.add('active');
+  }
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+
+</body>
+</html>
