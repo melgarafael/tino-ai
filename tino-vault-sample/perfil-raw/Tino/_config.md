@@ -1,7 +1,7 @@
 ---
 versao: 1
 criado: 2026-04-21
-refreshes_desde_ultimo_profile_sync: 1
+refreshes_desde_ultimo_profile_sync: 0
 ---
 
 
