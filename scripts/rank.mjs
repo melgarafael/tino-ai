@@ -134,6 +134,18 @@ async function readExistingFavorito(outPath) {
   }
 }
 
+// Mock não deve sobrescrever justificativa do Claude. Se o arquivo existente
+// tem ranker: claude no frontmatter, skipa e mantém o que já está lá.
+async function hasClaudeRanking(outPath) {
+  try {
+    const existing = await fs.readFile(outPath, 'utf8');
+    const { meta } = parse(existing);
+    return String(meta.ranker || '') === 'claude';
+  } catch {
+    return false;
+  }
+}
+
 function buildMdMeta(item, rank, existingFavorito) {
   return {
     id: String(item.id || ''),
@@ -171,13 +183,21 @@ export async function run(args, { rankFn = rankMock } = {}) {
 
   const tally = { Foca: 0, Considera: 0, Acompanha: 0, Ignore: 0 };
   const written = [];
+  let preservedClaude = 0;
 
   for (const item of items) {
+    const slug = slugifyId(item.id);
+    const outPath = path.join(args.outDir, `${slug}.md`);
+
+    // Preservação: se mock tentaria sobrescrever um .md ranqueado por Claude, skipa.
+    if (!args.dryRun && !args.overwriteClaude && await hasClaudeRanking(outPath)) {
+      preservedClaude += 1;
+      continue;
+    }
+
     const rank = rankFn(perfil, item, ajustes);
     tally[rank.veredito] = (tally[rank.veredito] || 0) + 1;
 
-    const slug = slugifyId(item.id);
-    const outPath = path.join(args.outDir, `${slug}.md`);
     const existingFavorito = args.dryRun ? false : await readExistingFavorito(outPath);
     const meta = buildMdMeta(item, rank, existingFavorito);
     const body = rank.justificativa || '';
@@ -195,6 +215,7 @@ export async function run(args, { rankFn = rankMock } = {}) {
     considera: tally.Considera,
     acompanha: tally.Acompanha,
     ignore: tally.Ignore,
+    preservados_claude: preservedClaude,
     out: args.outDir,
     dry_run: !!args.dryRun,
   };

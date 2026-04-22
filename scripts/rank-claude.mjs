@@ -18,7 +18,7 @@ import crypto from 'node:crypto';
 import { parse as parseFm, serialize as serializeFm } from '../lib/frontmatter.mjs';
 
 function parseArgs(argv) {
-  const args = { vault: null, onlyFoca: false, batch: 15, dryRun: false, limit: 999 };
+  const args = { vault: null, onlyFoca: false, batch: 15, dryRun: false, limit: 999, skipRanked: false };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === '--vault') args.vault = argv[++i];
@@ -26,6 +26,7 @@ function parseArgs(argv) {
     else if (a === '--batch') args.batch = Number(argv[++i]);
     else if (a === '--dry-run') args.dryRun = true;
     else if (a === '--limit') args.limit = Number(argv[++i]);
+    else if (a === '--skip-ranked') args.skipRanked = true;
     else if (a === '--help' || a === '-h') { printHelp(); process.exit(0); }
   }
   return args;
@@ -49,7 +50,7 @@ async function loadProfile(vault) {
   return parseFm(raw);
 }
 
-async function listNovidades(vault, { onlyFoca, limit }) {
+async function listNovidades(vault, { onlyFoca, limit, skipRanked }) {
   const dir = path.join(vault, 'Tino', 'novidades');
   const files = await fs.readdir(dir);
   const items = [];
@@ -60,6 +61,7 @@ async function listNovidades(vault, { onlyFoca, limit }) {
     const parsed = parseFm(raw);
     const nota = Number(parsed.meta.nota) || 0;
     if (onlyFoca && nota < 9) continue;
+    if (skipRanked && String(parsed.meta.ranker || '') === 'claude') continue;
     items.push({ file: f, full, meta: parsed.meta, body: parsed.body });
     if (items.length >= limit) break;
   }
@@ -176,41 +178,12 @@ async function rankAll(vault, args) {
   console.log(`→ ${batches.length} batch(es) de até ${args.batch} items`);
 
   let totalCost = 0;
-  const rankingsById = new Map();
-
-  for (let bi = 0; bi < batches.length; bi += 1) {
-    const batch = batches[bi];
-    process.stdout.write(`  batch ${bi + 1}/${batches.length} (${batch.length} items)...`);
-    const prompt = buildPrompt(profile, batch);
-    try {
-      const { rankings, costUsd } = await callClaude(prompt);
-      totalCost += costUsd;
-      for (const r of rankings) rankingsById.set(r.id, r);
-      process.stdout.write(` ✓ ${rankings.length} ranked · $${costUsd.toFixed(3)}\n`);
-    } catch (e) {
-      process.stdout.write(` ✗ ${e.message.slice(0, 120)}\n`);
-    }
-  }
-
-  console.log(`\n→ total: ${rankingsById.size}/${items.length} ranked · $${totalCost.toFixed(3)} USD`);
-
-  if (args.dryRun) {
-    console.log('\n--- DRY RUN (não escreveu nada) ---');
-    for (const it of items.slice(0, 10)) {
-      const r = rankingsById.get(String(it.meta.id));
-      if (!r) continue;
-      console.log(`\n[${r.nota}] ${r.veredito} · ${it.meta.titulo?.slice(0, 70)}`);
-      console.log(`  ${r.resumo}`);
-      console.log(`  ↳ ${r.justificativa}`);
-    }
-    return;
-  }
-
-  // Reescreve os .md
   let written = 0;
-  for (const it of items) {
-    const r = rankingsById.get(String(it.meta.id));
-    if (!r) continue;
+  const itemsByIdMap = new Map(items.map((it) => [String(it.meta.id), it]));
+
+  async function writeRanking(r) {
+    const it = itemsByIdMap.get(String(r.id));
+    if (!it) return false;
     const newMeta = {
       ...it.meta,
       nota: Number(r.nota),
@@ -222,9 +195,29 @@ async function rankAll(vault, args) {
     };
     const body = r.justificativa;
     await fs.writeFile(it.full, serializeFm(newMeta, body), 'utf8');
-    written += 1;
+    return true;
   }
-  console.log(`→ ${written} arquivos reescritos`);
+
+  for (let bi = 0; bi < batches.length; bi += 1) {
+    const batch = batches[bi];
+    const stamp = new Date().toISOString().slice(11, 19);
+    console.log(`  ${stamp} batch ${bi + 1}/${batches.length} (${batch.length} items)...`);
+    const prompt = buildPrompt(profile, batch);
+    try {
+      const { rankings, costUsd } = await callClaude(prompt);
+      totalCost += costUsd;
+      if (!args.dryRun) {
+        for (const r of rankings) {
+          if (await writeRanking(r)) written += 1;
+        }
+      }
+      console.log(`  ${new Date().toISOString().slice(11, 19)} ✓ ${rankings.length} ranked · $${costUsd.toFixed(3)} · escritos: ${written}`);
+    } catch (e) {
+      console.log(`  ✗ ${e.message.slice(0, 160)}`);
+    }
+  }
+
+  console.log(`\n→ total: ${written}/${items.length} ranked · $${totalCost.toFixed(3)} USD`);
 }
 
 async function main() {
