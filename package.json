@@ -6,12 +6,14 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "test:foundation": "node --test tests/perfil-vibecoder-schema.test.mjs tests/aitmpl-client.test.mjs tests/curated-stack.test.mjs",
     "test:e2e": "playwright test",
     "test:all": "npm test && npm run test:e2e",
     "serve": "python3 -m http.server 5173",
     "dashboard:data": "node scripts/generate-dashboard-data.mjs"
   },
   "dependencies": {
+    "ajv": "^8.20.0",
     "fast-xml-parser": "^4.5.0",
     "yaml": "^2.5.0"
   },
