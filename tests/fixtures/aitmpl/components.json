@@ -1,0 +1,157 @@
+{
+  "skills": [
+    {
+      "name": "superpowers-tdd",
+      "path": "skills/superpowers/tdd.md",
+      "category": "discipline",
+      "type": "skill",
+      "content": "# TDD\n\nTest-driven development discipline. Write the test, watch it fail, write the code, watch it pass, refactor.",
+      "description": "Test-driven development discipline",
+      "author": "anthropic",
+      "repo": "https://github.com/anthropic/superpowers",
+      "version": "1.0.0",
+      "license": "MIT",
+      "keywords": ["tdd", "testing", "discipline"],
+      "downloads": 1240
+    },
+    {
+      "name": "frontend-design",
+      "path": "skills/frontend-design/main.md",
+      "category": "design",
+      "type": "skill",
+      "content": "# Frontend Design\n\nBuild distinctive frontend interfaces with high design quality.",
+      "description": "Build distinctive frontend interfaces",
+      "author": "anthropic",
+      "repo": "https://github.com/anthropic/skills",
+      "version": "1.2.0",
+      "license": "MIT",
+      "keywords": ["ui", "design", "frontend"],
+      "downloads": 870
+    }
+  ],
+  "agents": [
+    {
+      "name": "code-reviewer",
+      "path": "agents/code-reviewer.md",
+      "category": "review",
+      "type": "agent",
+      "content": "# Code Reviewer\n\nReviews code for quality, style, and correctness.",
+      "description": "Reviews code changes for quality and correctness",
+      "author": "community",
+      "repo": "https://github.com/aitmpl/agents",
+      "version": "0.4.1",
+      "license": "MIT",
+      "keywords": ["review", "quality"],
+      "downloads": 412
+    },
+    {
+      "name": "test-writer",
+      "path": "agents/test-writer.md",
+      "category": "testing",
+      "type": "agent",
+      "content": "# Test Writer\n\nGenerates unit and integration tests from source code.",
+      "description": "Generates tests from source",
+      "author": "community",
+      "repo": "https://github.com/aitmpl/agents",
+      "version": "0.2.0",
+      "license": "MIT",
+      "keywords": ["testing", "automation"],
+      "downloads": 305
+    }
+  ],
+  "mcps": [
+    {
+      "name": "context7",
+      "path": "mcps/context7.md",
+      "category": "documentation",
+      "type": "mcp",
+      "content": "# Context7\n\nFetches up-to-date library documentation.",
+      "description": "Fetches current library documentation",
+      "author": "upstash",
+      "repo": "https://github.com/upstash/context7",
+      "version": "2.1.0",
+      "license": "Apache-2.0",
+      "keywords": ["docs", "mcp"],
+      "downloads": 5200
+    },
+    {
+      "name": "playwright",
+      "path": "mcps/playwright.md",
+      "category": "browser",
+      "type": "mcp",
+      "content": "# Playwright MCP\n\nBrowser automation via MCP protocol.",
+      "description": "Browser automation through MCP",
+      "author": "microsoft",
+      "repo": "https://github.com/microsoft/playwright-mcp",
+      "version": "0.9.0",
+      "license": "Apache-2.0",
+      "keywords": ["browser", "mcp", "automation"],
+      "downloads": 4100
+    }
+  ],
+  "hooks": [
+    {
+      "name": "anti-burro",
+      "path": "hooks/anti-burro.md",
+      "category": "guardrail",
+      "type": "hook",
+      "content": "# Anti-Burro\n\nBlocks dangerous commands.",
+      "description": "Guardrail hook against dangerous commands",
+      "author": "rafaelmelgaco",
+      "repo": "https://github.com/rafaelmelgaco/hooks",
+      "version": "0.3.0",
+      "license": "MIT",
+      "keywords": ["safety", "guardrail"],
+      "downloads": 88
+    },
+    {
+      "name": "anti-preguicoso",
+      "path": "hooks/anti-preguicoso.md",
+      "category": "discipline",
+      "type": "hook",
+      "content": "# Anti-Preguicoso\n\nForces actual investigation, no shortcuts.",
+      "description": "Forces real investigation",
+      "author": "rafaelmelgaco",
+      "repo": "https://github.com/rafaelmelgaco/hooks",
+      "version": "0.2.0",
+      "license": "MIT",
+      "keywords": ["discipline"],
+      "downloads": 64
+    }
+  ],
+  "plugins": [
+    {
+      "name": "superpowers",
+      "path": "plugins/superpowers/manifest.json",
+      "category": "meta",
+      "type": "plugin",
+      "content": "# Superpowers\n\nMeta-plugin bundling skills, hooks, and agents.",
+      "description": "Bundle of disciplined development skills",
+      "author": "anthropic",
+      "repo": "https://github.com/anthropic/superpowers",
+      "version": "1.5.0",
+      "license": "MIT",
+      "keywords": ["plugin", "bundle"],
+      "downloads": 1980
+    }
+  ],
+  "commands": [
+    {
+      "name": "tino-setup",
+      "path": "commands/tino-setup.md",
+      "category": "tino",
+      "type": "command",
+      "content": "# /tino:setup\n\nInicializa o Tino em um vault Obsidian.",
+      "description": "Inicializa o Tino em um vault Obsidian",
+      "author": "rafaelmelgaco",
+      "repo": "https://github.com/rafaelmelgaco/tino-ai",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": ["tino", "obsidian"],
+      "downloads": 12
+    }
+  ],
+  "settings": [],
+  "sandbox": [],
+  "templates": []
+}
