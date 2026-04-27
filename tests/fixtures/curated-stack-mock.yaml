@@ -1,0 +1,52 @@
+schema_version: 1
+maintainers:
+  - test@example.com
+last_review: 2026-04-27
+
+essentials:
+  - name: context7
+    kind: mcp
+    install: "claude mcp add context7"
+    why: "docs"
+    source: aitmpl
+    aitmpl_id: context7
+
+by_role:
+  junior:
+    - name: superpowers
+      kind: plugin
+      install: "/plugin install superpowers"
+      why: "tdd"
+      source: aitmpl
+      aitmpl_id: superpowers
+    - name: tdd-helper
+      kind: skill
+      install: "/skill install tdd-helper"
+      why: "tdd"
+      source: curated
+
+  empresario:
+    - name: discerna
+      kind: plugin
+      install: "/plugin install discerna"
+      why: "conteudo"
+      source: curated
+
+by_plan:
+  pro:
+    - name: code-saver
+      kind: skill
+      install: "/skill install code-saver"
+      why: "economia"
+      source: curated
+  max:
+    - name: epic-executor
+      kind: skill
+      install: "/skill install epic-executor"
+      why: "epics"
+      source: aitmpl
+      aitmpl_id: epic-executor
+
+incompatible:
+  - items: [tdd-helper, code-saver]
+    reason: "conflito hipotetico"
