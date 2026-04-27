@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tino.ai/schemas/recomendacao.schema.json",
+  "title": "Recomendacao Vibecoder",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "generated_for_perfil",
+    "counts",
+    "items",
+    "incompatibilities_avoided"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "generated_for_perfil": { "type": "string", "minLength": 1 },
+    "counts": {
+      "type": "object",
+      "required": ["total"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "essentials": { "type": "integer", "minimum": 0 },
+        "by_role": { "type": "integer", "minimum": 0 },
+        "by_plan": { "type": "integer", "minimum": 0 },
+        "extras_aitmpl": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "kind", "source_section", "install", "why"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "kind": {
+            "enum": ["skill", "agent", "command", "hook", "mcp", "plugin"]
+          },
+          "source_section": {
+            "enum": ["essentials", "by_role", "by_plan", "extras_aitmpl"]
+          },
+          "install": { "type": "string" },
+          "why": { "type": "string" },
+          "aitmpl_id": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "incompatibilities_avoided": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["items", "kept", "reason"],
+        "properties": {
+          "items": { "type": "array", "items": { "type": "string" } },
+          "kept": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
