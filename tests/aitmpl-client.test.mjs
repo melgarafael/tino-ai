@@ -63,3 +63,22 @@ test('fetchCatalog: cache vazio + network fail joga AitmplUnavailableError', asy
     mock.setFailMode(false);
   }
 });
+
+// ===== fetchItem =====
+
+test('fetchItem: encontra item existente por name', async () => {
+  const it = await fetchItem('skills', 'superpowers-tdd', makeOpts());
+  assert.ok(it, 'deveria retornar item');
+  assert.equal(it.name, 'superpowers-tdd');
+  assert.equal(it.type, 'skill');
+});
+
+test('fetchItem: retorna null quando name nao existe', async () => {
+  const it = await fetchItem('skills', 'nao-existe-xyz', makeOpts());
+  assert.equal(it, null);
+});
+
+test('fetchItem: retorna null quando kind nao existe', async () => {
+  const it = await fetchItem('nao-existe-kind', 'qualquer', makeOpts());
+  assert.equal(it, null);
+});
