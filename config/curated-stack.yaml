@@ -1,0 +1,38 @@
+schema_version: 1
+maintainers:
+  - rafael@maudibrasil.com.br
+last_review: 2026-04-27
+
+essentials:
+  - name: context7
+    kind: mcp
+    install: "claude mcp add context7 https://mcp.context7.com/mcp"
+    why: "Docs oficiais sempre atualizadas — corta alucinacao massivamente"
+    source: aitmpl
+    aitmpl_id: context7
+
+by_role:
+  junior:
+    - name: superpowers
+      kind: plugin
+      install: "/plugin install superpowers"
+      why: "Skills de TDD, debugging sistematico, brainstorming — evita os erros mais comuns de iniciante"
+      source: aitmpl
+      aitmpl_id: superpowers
+  empresario:
+    - name: discerna
+      kind: plugin
+      install: "/plugin install discerna"
+      why: "Analise de conteudo — util pra empresario que cria material e precisa filtrar referencias"
+      source: curated
+
+by_plan:
+  max:
+    - name: epic-executor
+      kind: skill
+      install: "via plugin epic-executor"
+      why: "Executa epics autonomos wave-a-wave — vale a pena com Opus disponivel"
+      source: aitmpl
+      aitmpl_id: epic-executor
+
+incompatible: []
