@@ -82,3 +82,21 @@ test('fetchItem: retorna null quando kind nao existe', async () => {
   const it = await fetchItem('nao-existe-kind', 'qualquer', makeOpts());
   assert.equal(it, null);
 });
+
+// ===== search =====
+
+test('search: encontra por substring no name ou description', async () => {
+  const res = await search('TDD', makeOpts());
+  assert.ok(Array.isArray(res));
+  assert.ok(res.some((it) => it.name === 'superpowers-tdd'), `esperava superpowers-tdd, vieram: ${res.map(r => r.name)}`);
+});
+
+test('search: respeita limit', async () => {
+  const res = await search('a', makeOpts({ limit: 1 }));
+  assert.equal(res.length, 1);
+});
+
+test('search: query vazia retorna lista vazia', async () => {
+  const res = await search('', makeOpts());
+  assert.deepEqual(res, []);
+});
