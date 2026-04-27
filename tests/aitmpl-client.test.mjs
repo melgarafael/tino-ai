@@ -100,3 +100,33 @@ test('search: query vazia retorna lista vazia', async () => {
   const res = await search('', makeOpts());
   assert.deepEqual(res, []);
 });
+
+// ===== invalidateCache =====
+
+test('invalidateCache: kind null apaga components.json e meta', async () => {
+  await fetchCatalog(makeOpts({ kinds: ['skills'] }));
+  await invalidateCache(null, makeOpts());
+  const exists = async (p) => fs.access(p).then(() => true).catch(() => false);
+  assert.equal(await exists(path.join(cacheDir, 'components.json')), false);
+  assert.equal(await exists(path.join(cacheDir, 'components.meta.json')), false);
+});
+
+test('invalidateCache: kind especifico tambem apaga tudo + warn', async () => {
+  await fetchCatalog(makeOpts({ kinds: ['skills'] }));
+  const warnings = [];
+  const orig = console.warn;
+  console.warn = (...a) => warnings.push(a.join(' '));
+  try {
+    await invalidateCache('skills', makeOpts());
+    const exists = async (p) => fs.access(p).then(() => true).catch(() => false);
+    assert.equal(await exists(path.join(cacheDir, 'components.json')), false);
+    assert.ok(warnings.some((w) => w.includes('single-file') || w.includes('not supported')), `esperava warning sobre single-file, vieram: ${warnings}`);
+  } finally {
+    console.warn = orig;
+  }
+});
+
+test('invalidateCache: cacheDir inexistente nao explode', async () => {
+  await invalidateCache(null, { ...makeOpts(), cacheDir: '/tmp/tino-nao-existe-xyz-' + Date.now() });
+  // sem assert — basta nao throw
+});
