@@ -40,6 +40,28 @@ Dois critérios de projeto, também testados:
 
 ---
 
+## Modo vibecoder (Onda 1)
+
+O Tino agora também é um **assistente de configuração do Claude Code** pra quem está começando a programar com IA. Roda um wizard de 5 minutos que:
+
+1. **Faz triagem** sobre você (papel, experiência, plano Claude, projeto, tolerância a risco)
+2. **Recomenda** skills/agents/MCPs/plugins/hooks adequados ao seu perfil — mistura curadoria do time Tino com o catálogo público do [aitmpl.com](https://aitmpl.com)
+3. **Aplica** a configuração: gera CLAUDE.md customizado, opcionalmente patch de `~/.claude/settings.json`, e um `install.sh` executável
+
+```bash
+/tino:vibe-onboard ~/seu-vault-obsidian
+```
+
+Comandos individuais (escape hatches):
+
+- `/tino:vibe-setup <vault>` — só triagem (gera `Tino/_perfil-vibecoder.md`)
+- `/tino:vibe-stack <vault>` — só recomendação (gera `Tino/_recomendacao.md`)
+- `/tino:vibe-install <vault>` — só instalação (gera CLAUDE.md + install.sh + opcional settings.json)
+
+Tudo respeita o `modo_autonomia` que você escolheu na triagem (`perguntativo` / `balanceado` / `autonomo`). Settings global SEMPRE pede confirmação explícita, mesmo em modo autônomo.
+
+---
+
 ## Pré-requisitos
 
 Você vai precisar de um ambiente modesto:
@@ -81,6 +103,7 @@ npx playwright install chromium
 - Symlinka `bin/tino` → `~/.local/bin/tino` (CLI global)
 - Symlinka os 4 slash commands → `~/.claude/commands/tino-*.md` (funcionam em **qualquer projeto** do Claude Code, não só dentro do repo)
 - Symlinka os 3 agents → `~/.claude/agents/`
+- Symlinka as skills `tino-*` → `~/.claude/skills/` (carregadas automaticamente quando o gatilho casa)
 - Tudo reversível via `uninstall.sh` — repo e vaults ficam intactos
 
 Depois disso, tanto o CLI `tino` quanto os `/tino:*` funcionam de **qualquer diretório**. Você pode apagar o repo da memória mental — só precisa saber do comando.
@@ -233,13 +256,59 @@ Escreve o resultado em `{vault}/Tino/favoritos/<slug>.md`. Só roda em favoritos
 
 ---
 
+## Skills (auto-trigger)
+
+Além dos slash commands explícitos, o Tino expõe skills carregadas automaticamente pelo Claude Code quando o gatilho casa com o que você está pedindo. Skills não precisam ser invocadas com `/` — basta descrever o que você quer.
+
+### `tino-pre-dev-research`
+
+Especialista em pesquisa pré-desenvolvimento. Recebe um pedido vago de software ("quero criar uma skill que edita vídeo automaticamente com Remotion"), faz uma entrevista direcionada baseada em arquétipo, pesquisa fontes reais na web (forums, GitHub, post-mortems, eng blogs) com regra anti-hallucination dura, e produz 10 documentos `.md` em `{vault}/Tino/research/pre-development/<slug>/` que servem de input universal para planning AIs.
+
+**Quando dispara**:
+
+- "quero criar uma skill / um agente / um app que faça X"
+- "preciso pesquisar antes de começar Y"
+- "qual a melhor stack para Z"
+- "ajuda a planejar um projeto novo"
+
+**Como funciona** (resumido):
+
+1. Triagem por arquétipo — classifica o projeto em um dos 8 tipos (skill/agent, SaaS web, CLI, mobile, library, data pipeline, automação interna, content creation)
+2. Entrevista direcionada — perguntas específicas do arquétipo + escolha de profundidade (`quick` / `standard` / `deep`)
+3. Pesquisa web real — sub-agentes paralelos por dimensão, com regra anti-hallucination dura (zero fonte inventada)
+4. Síntese — 10 documentos `.md` com citações, scoring de confiança, conflitos explícitos
+
+**Output**: `{vault}/Tino/research/pre-development/<slug>/` com 10 docs:
+
+```
+00-brief.md              # Captura da entrevista
+01-landscape.md          # Soluções existentes
+02-stacks.md             # Stacks candidatas com tradeoffs
+03-architecture.md       # Padrões arquiteturais
+04-workflows.md          # Como times reais trabalham
+05-pitfalls.md           # Erros comuns e post-mortems
+06-community-pulse.md    # O que a comunidade recomenda HOJE
+07-references.md         # Bibliografia com tier de credibilidade
+08-decision-frame.md     # Tradeoffs em aberto
+09-handoff.md            # Brief universal pronto para planning AI
+```
+
+**Integração**: o `09-handoff.md` é desenhado como input universal para planning AIs — funciona com `/octo:prd`, `/idea-to-execution`, AIOS master e `/octo:plan` sem retrabalho.
+
+**Idioma**: você fala com a skill em PT-BR; ela escreve os 10 docs em EN (planning AIs performam melhor em EN). Conversação sempre PT-BR.
+
+**Profundidade**: `quick` (3min/dimensão) · `standard` (6min) · `deep` (12min).
+
+---
+
 ## Estrutura do projeto
 
 ```
 tino-ai/
 ├── .claude/
 │   ├── agents/             # Subagents: profile-extractor, ranker, deep-diver
-│   └── commands/           # Skills: /tino:setup, :refresh, :profile-sync, :deep-dive
+│   ├── commands/           # Slash commands: /tino:setup, :refresh, :profile-sync, :deep-dive
+│   └── skills/             # Auto-trigger skills: tino-pre-dev-research
 ├── config/
 │   ├── sources.default.yaml   # 30+ fontes RSS/Atom pré-configuradas
 │   └── prompts/            # Prompts dos subagents (extract-profile, rank-novelty, deep-dive)
