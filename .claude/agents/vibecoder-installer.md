@@ -15,7 +15,7 @@ Você aplica a configuração do user vibecoder no Claude Code dele.
 
 ### 1. Lê perfil + recomendação
 
-Parse perfil via `lib/frontmatter.mjs`. Validate via `lib/perfil-vibecoder-writer.mjs::validate`. Se inválido, peça pra rodar `/tino:vibe-setup --re-run`.
+Parse perfil via `yaml.parse` (NÃO use `lib/frontmatter.mjs` — esse helper do MVP só suporta arrays inline; o perfil-vibecoder usa block-style). Validate via `lib/perfil-vibecoder-writer.mjs::validate`. Se inválido, peça pra rodar `/tino:vibe-setup --re-run`.
 
 Lê recomendação. Extrai lista de items.
 
@@ -23,12 +23,14 @@ Lê recomendação. Extrai lista de items.
 
 ```bash
 node -e "
-import('./lib/claude-md-template.mjs').then(async (t) => {
-  const fm = await import('./lib/frontmatter.mjs');
+(async () => {
+  const t = await import('./lib/claude-md-template.mjs');
+  const yaml = await import('yaml');
   const { promises: fs } = await import('node:fs');
   const path = await import('node:path');
   const md = await fs.readFile(process.argv[1] + '/Tino/_perfil-vibecoder.md', 'utf8');
-  const { meta } = fm.parse(md);
+  const fmMatch = md.match(/^---\\n([\\s\\S]*?)\\n---/);
+  const meta = yaml.parse(fmMatch[1]);
   const out = t.render(meta);
   const target = path.join(process.argv[2], 'CLAUDE.md');
   try {
@@ -38,7 +40,7 @@ import('./lib/claude-md-template.mjs').then(async (t) => {
   } catch {}
   await fs.writeFile(target, out, 'utf8');
   console.log('CLAUDE.md written to ' + target);
-});
+})();
 " -- $VAULT $PROJECT_ROOT
 ```
 
@@ -48,17 +50,19 @@ Confirmar com user antes (mesmo em modo_autonomia: autonomo, este é arquivo de 
 
 ```bash
 node -e "
-import('./lib/install-sh-render.mjs').then(async (r) => {
-  const fm = await import('./lib/frontmatter.mjs');
+(async () => {
+  const r = await import('./lib/install-sh-render.mjs');
+  const yaml = await import('yaml');
   const { promises: fs } = await import('node:fs');
   const path = await import('node:path');
   const md = await fs.readFile(process.argv[1] + '/Tino/_recomendacao.md', 'utf8');
-  const { meta } = fm.parse(md);
+  const fmMatch = md.match(/^---\\n([\\s\\S]*?)\\n---/);
+  const meta = yaml.parse(fmMatch[1]);
   const sh = r.render(meta.items);
   const target = path.join(process.argv[1], 'Tino', '_install.sh');
   await fs.writeFile(target, sh, { mode: 0o755 });
   console.log('install.sh written to ' + target);
-});
+})();
 " -- $VAULT
 ```
 
@@ -66,23 +70,26 @@ import('./lib/install-sh-render.mjs').then(async (r) => {
 
 ```bash
 node -e "
-import('./lib/settings-patch.mjs').then(async (sp) => {
-  const fm = await import('./lib/frontmatter.mjs');
+(async () => {
+  const sp = await import('./lib/settings-patch.mjs');
+  const yaml = await import('yaml');
   const { promises: fs } = await import('node:fs');
   const path = await import('node:path');
   const os = await import('node:os');
+  const tinoHome = await import('./lib/tino-home.mjs').then(m => m.resolveHomePath()).catch(() => null);
   const md = await fs.readFile(process.argv[1] + '/Tino/_perfil-vibecoder.md', 'utf8');
-  const { meta: perfil } = fm.parse(md);
+  const fmMatch = md.match(/^---\\n([\\s\\S]*?)\\n---/);
+  const perfil = yaml.parse(fmMatch[1]);
   const settingsPath = path.join(os.homedir(), '.claude', 'settings.json');
   let curr = {};
   try { curr = JSON.parse(await fs.readFile(settingsPath, 'utf8')); } catch {}
-  const patch = sp.computePatch(perfil);
+  const patch = sp.computePatch(perfil, { tinoHome: tinoHome || '\$TINO_HOME' });
   const next = sp.applyPatch(curr, patch);
   console.log('---DIFF---');
   console.log('From:', JSON.stringify(curr, null, 2));
   console.log('To:', JSON.stringify(next, null, 2));
   console.log('---END DIFF---');
-});
+})();
 " -- $VAULT
 ```
 

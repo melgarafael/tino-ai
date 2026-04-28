@@ -14,7 +14,7 @@ Você gera o `_recomendacao.md` no vault do user com base no perfil dele.
 
 ## Sequência
 
-1. **Parse perfil:** lê `{vault}/Tino/_perfil-vibecoder.md`, extrai frontmatter via `lib/frontmatter.mjs::parse`.
+1. **Parse perfil:** lê `{vault}/Tino/_perfil-vibecoder.md`, extrai frontmatter via `yaml.parse` (NÃO use `lib/frontmatter.mjs` — esse helper do MVP só suporta arrays inline; o perfil-vibecoder usa block-style).
 
 2. **Validate perfil:** chama `lib/perfil-vibecoder-writer.mjs::validate(fm)`. Se erros, peça pro user rodar `/tino:vibe-setup --re-run`.
 
@@ -43,16 +43,19 @@ Você executa via Bash chamando um script Node ad-hoc:
 
 ```bash
 node -e "
-import('./lib/frontmatter.mjs').then(async (fm) => {
+(async () => {
   const { promises: fs } = await import('node:fs');
   const path = await import('node:path');
+  const yaml = await import('yaml');
   const validator = await import('./lib/perfil-vibecoder-writer.mjs');
   const pipeline = await import('./lib/recommender-pipeline.mjs');
 
   const vaultPath = process.argv[1];
   const perfilPath = path.join(vaultPath, 'Tino', '_perfil-vibecoder.md');
   const md = await fs.readFile(perfilPath, 'utf8');
-  const { meta } = fm.parse(md);
+  const fmMatch = md.match(/^---\\n([\\s\\S]*?)\\n---/);
+  if (!fmMatch) { console.error('PERFIL SEM FRONTMATTER'); process.exit(1); }
+  const meta = yaml.parse(fmMatch[1]);
   const errs = validator.validate(meta);
   if (errs.length > 0) { console.error('PERFIL INVALIDO:', errs); process.exit(1); }
 
