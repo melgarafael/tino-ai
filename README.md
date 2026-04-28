@@ -40,6 +40,52 @@ Dois critérios de projeto, também testados:
 
 ---
 
+## O que vem dentro (inventário)
+
+O Tino entrega 4 capacidades em camadas. Use a tabela como mapa — cada item tem seção dedicada abaixo.
+
+### 🗞️  Curador de novidades (MVP)
+
+| Tipo | Item | Pra que serve |
+|------|------|---------------|
+| Comando | `/tino:setup <vault>` | Cria estrutura `Tino/` no seu vault Obsidian + `_perfil.md` extraído |
+| Comando | `/tino:refresh` | Coleta 30+ fontes RSS + ranqueia + escreve em `Tino/novidades/` |
+| Comando | `/tino:profile-sync` | Re-extrai perfil quando você muda de foco |
+| Comando | `/tino:deep-dive <id>` | Aprofunda novidade favoritada (tutorial + casos + sentimento) |
+| Subagent | `profile-extractor` | Sintetiza perfil a partir do vault |
+| Subagent | `ranker` | Ranqueia novidades contra o perfil |
+| Subagent | `deep-diver` | Pesquisa profunda em favoritos |
+| Frontend | `dashboard.html` | Single-file que lê o vault via File System Access API |
+
+### 🔬 Pesquisa pré-desenvolvimento (skill auto-trigger)
+
+| Tipo | Item | Pra que serve |
+|------|------|---------------|
+| Skill | `tino-pre-dev-research` | Recebe ideia vaga ("quero criar X"), pesquisa real na web (anti-hallucination), produz 10 docs `.md` em EN prontos pra alimentar planning AIs |
+
+### 🎓 Modo vibecoder — setup assistido (Onda 1)
+
+| Tipo | Item | Pra que serve |
+|------|------|---------------|
+| Comando | `/tino:vibe-onboard <vault>` | Wizard end-to-end (5 min): triagem → recomendação → instalação |
+| Comando | `/tino:vibe-setup <vault>` | Só triagem (12 perguntas → `_perfil-vibecoder.md` validado) |
+| Comando | `/tino:vibe-stack <vault>` | Só recomendação (curado + aitmpl.com → `_recomendacao.md`) |
+| Comando | `/tino:vibe-install <vault>` | Só instalação (CLAUDE.md + settings.json patch + `_install.sh`) |
+| Subagent | `vibecoder-interviewer` | Conduz triagem |
+| Subagent | `vibecoder-recommender` | Combina curated-stack + aitmpl.com |
+| Subagent | `vibecoder-installer` | Aplica configuração com salvaguardas |
+
+### 🛡️ Hooks runtime (Onda 2)
+
+| Tipo | Item | Pra que serve |
+|------|------|---------------|
+| Hook `UserPromptSubmit` | `anti-preguiçoso` | Detecta prompts curtos/vagos/error-paste — sugere reformulação |
+| Hook `UserPromptSubmit` | `anti-burro` | Detecta loops "tenta de novo" + repetição literal — força pausa |
+
+Os 2 hooks rodam em **70-100ms** (heurística pura, zero Claude API call no hot path) e respeitam o campo `intervencao_hooks` do seu perfil (`silenciosa`/`ativa`/`agressiva`).
+
+---
+
 ## Modo vibecoder (Onda 1)
 
 O Tino agora também é um **assistente de configuração do Claude Code** pra quem está começando a programar com IA. Roda um wizard de 5 minutos que:
@@ -62,12 +108,54 @@ Tudo respeita o `modo_autonomia` que você escolheu na triagem (`perguntativo` /
 
 ### Hooks runtime (Onda 2)
 
-Depois do setup, dois hooks ficam ativos no seu Claude Code global e te avisam quando voce comete os erros tipicos de iniciante:
+Depois do setup, dois hooks ficam ativos no seu Claude Code global e te avisam quando você comete os erros mais típicos do vibe coder iniciante. Heurística pura no hot path — **70-100ms por hook** (sem Claude API call), sem latência percebida.
 
-- **anti-preguicoso** — prompt curto demais, vago ("isso", "aquilo") ou error paste sem pergunta
-- **anti-burro** — "tenta de novo" sem novo contexto, prompt identico repetido, mesmo erro citado de novo
+#### `anti-preguiçoso`
 
-Comportamento (ativa, agressiva ou silenciosa) eh controlado pelo campo `intervencao_hooks` do seu `Tino/_perfil-vibecoder.md`. Veja [docs/hooks-vibecoder.md](docs/hooks-vibecoder.md) pra detalhes de uso, debug e desativacao.
+Detecta prompts que costumam virar bola-de-neve:
+
+- Prompt < 30 chars sem ser pergunta clara (ex: "faz isso")
+- Palavra vaga isolada (`isso`, `aquilo`, `esse troço`, `tipo assim`, `né`)
+- Error paste sem pergunta (3+ linhas com stack trace mas sem `?` nem instrução)
+
+**Whitelist** evita falsos positivos: `ok`, `sim`, `prossiga`, `continue`, `cancela`, comandos `/...`, perguntas com "como"/"qual"/"quando".
+
+#### `anti-burro`
+
+Detecta o padrão clássico de loop sem nova informação:
+
+- "tenta de novo", "refaz", "de novo", "tenta outra vez" sem novo contexto
+- Mesmo prompt enviado 2+ vezes em sequência
+- Mesmo fragmento de erro repetido em prompts anteriores
+
+State persiste em `{vault}/.tino-cache/prompt-history.jsonl` (jsonl, rotacionado automaticamente em 1000 entries).
+
+#### Modos de intervenção
+
+Comportamento controlado pelo campo `intervencao_hooks` do `Tino/_perfil-vibecoder.md`:
+
+| Modo | O que faz | Quando usar |
+|------|-----------|-------------|
+| `silenciosa` | Apenas registra em `.tino-cache/hook-log.jsonl`. Sem aviso visual. | Quer telemetria sem fricção |
+| `ativa` | Renderiza box ANSI no stderr quando flagged. **Não bloqueia.** | Default sugerido — útil sem ser chato |
+| `agressiva` | Box + bloqueia o prompt (exit 2). Força você a reformular. | Quando quer disciplina forte |
+
+#### Exemplo de output (modo ativa, prompt vago)
+
+```
+╭─ 🤔 Tino [anti-preguiçoso] ─────────────────────────────╮
+│                                                         │
+│  Detectei sinais de prompt preguiçoso:                 │
+│  • prompt vago sem referente — diga o que você quer    │
+│                                                         │
+│  Sugestão: descreva objetivo + resultado esperado      │
+│  + o que já tentou.                                    │
+│                                                         │
+│  Modo: ativa                                            │
+╰─────────────────────────────────────────────────────────╯
+```
+
+Suporte `NO_COLOR` e `TERM=dumb` pra terminais legacy. Veja [docs/hooks-vibecoder.md](docs/hooks-vibecoder.md) pra detalhes de instalação manual, debug e como desativar.
 
 ---
 
@@ -263,6 +351,30 @@ Aprofunda uma novidade **já favoritada**. Chama o subagent `deep-diver` que com
 
 Escreve o resultado em `{vault}/Tino/favoritos/<slug>.md`. Só roda em favoritos para proteger seu budget — aprofundar 50 novidades por dia sairia caro.
 
+### Comandos do modo vibecoder (Onda 1)
+
+Quatro comandos que turbinam usuários iniciantes do Claude Code. Detalhes completos na seção [Modo vibecoder (Onda 1)](#modo-vibecoder-onda-1).
+
+#### `/tino:vibe-onboard <vault>`
+
+Wizard end-to-end (~5 min). Conduz triagem → recomendação → instalação em sequência com confirmação entre etapas. **Porta padrão pro júnior** — não precisa decidir qual subcomando rodar.
+
+```
+/tino:vibe-onboard /Users/voce/Documents/vault
+```
+
+#### `/tino:vibe-setup <vault> [--re-run]`
+
+Só a triagem (escape hatch). 12 perguntas conduzidas pelo agent `vibecoder-interviewer`, valida resposta a resposta contra JSON Schema, escreve `Tino/_perfil-vibecoder.md`. Use `--re-run` pra sobrescrever sem perguntar.
+
+#### `/tino:vibe-stack <vault>`
+
+Só a recomendação (escape hatch). Lê o perfil, combina `config/curated-stack.yaml` (curadoria do time Tino) com extras dinâmicos do [aitmpl.com](https://aitmpl.com), filtra o que você já tem instalado, evita conflitos via `incompatible[]`. Escreve `Tino/_recomendacao.md` legível antes do install.
+
+#### `/tino:vibe-install <vault> [--project-root <dir>]`
+
+Só a instalação (escape hatch). Gera `{project-root}/CLAUDE.md` customizado pro seu perfil + `Tino/_install.sh` executável + opcionalmente patcheia `~/.claude/settings.json` com permissions e hooks. **Settings global SEMPRE pede confirmação explícita** (mesmo em modo autônomo) + backup automático.
+
 ---
 
 ## Skills (auto-trigger)
@@ -310,41 +422,99 @@ Especialista em pesquisa pré-desenvolvimento. Recebe um pedido vago de software
 
 ---
 
+## Agents (subagentes)
+
+Subagents são especialistas convocados pelos comandos. Você não os invoca diretamente — eles são despachados via Task tool conforme contexto. Vivem em `.claude/agents/`.
+
+### Subagents do MVP (curador)
+
+| Agent | Quando dispara | O que faz |
+|-------|---------------|-----------|
+| `profile-extractor` | `/tino:setup` | Escaneia vault, sintetiza `_perfil.md` (identidade + foco + evita) |
+| `ranker` | `/tino:refresh` | Ranqueia novidades contra perfil — produz nota 0-10 + veredito + justificativa com citação do vault |
+| `deep-diver` | `/tino:deep-dive` | Pesquisa web profunda em favoritos: tutorial, casos, sentimento da comunidade |
+
+### Subagents do modo vibecoder (Onda 1)
+
+| Agent | Quando dispara | O que faz |
+|-------|---------------|-----------|
+| `vibecoder-interviewer` | `/tino:vibe-setup` | Conduz triagem (12 perguntas, uma por vez), valida resposta a resposta, escreve `_perfil-vibecoder.md` |
+| `vibecoder-recommender` | `/tino:vibe-stack` | Roda pipeline `resolve(perfil, curated) + extras aitmpl + render`, grava `_recomendacao.md` com graceful degrade se aitmpl indisponível |
+| `vibecoder-installer` | `/tino:vibe-install` | Gera CLAUDE.md, `_install.sh` (chmod +x), calcula diff de settings.json (sempre confirma) e executa install conforme `modo_autonomia` |
+
+---
+
+## Hooks runtime (Onda 2)
+
+Hooks são scripts que rodam automaticamente em eventos do Claude Code (registrados em `~/.claude/settings.json`). O Tino entrega 2 hooks `UserPromptSubmit` que ficam ativos em **toda sessão Claude** depois do `/tino:vibe-install`.
+
+| Hook | Arquivo | Detecta | Latência típica |
+|------|---------|---------|----------------|
+| `anti-preguiçoso` | `hooks/anti-preguicoso.mjs` | Prompt curto sem contexto, palavra vaga isolada, error paste sem pergunta | 70-100ms |
+| `anti-burro` | `hooks/anti-burro.mjs` | "tenta de novo" sem novo contexto, prompt repetido literalmente, fragmento de erro reusado | 70-100ms |
+
+**Como ativar:** rode `/tino:vibe-install` (Onda 1) com perfil que tenha `intervencao_hooks` definido. O install gera o bloco `hooks` no seu `~/.claude/settings.json` apontando pra `$TINO_HOME/hooks/anti-{preguicoso,burro}.mjs`.
+
+**Como desativar:** edite `_perfil-vibecoder.md` mudando `intervencao_hooks` pra `silenciosa` (vira só log, sem aviso visual). OU remova o bloco `hooks` do `settings.json` (backup automático foi criado pelo install).
+
+Detalhes completos (debug, install manual, formato do log) em [docs/hooks-vibecoder.md](docs/hooks-vibecoder.md).
+
+---
+
 ## Estrutura do projeto
 
 ```
 tino-ai/
 ├── .claude/
-│   ├── agents/             # Subagents: profile-extractor, ranker, deep-diver
-│   ├── commands/           # Slash commands: /tino:setup, :refresh, :profile-sync, :deep-dive
-│   └── skills/             # Auto-trigger skills: tino-pre-dev-research
+│   ├── agents/             # 6 subagents
+│   │   ├── profile-extractor.md, ranker.md, deep-diver.md          # MVP
+│   │   └── vibecoder-{interviewer,recommender,installer}.md         # Onda 1
+│   ├── commands/           # 8 slash commands
+│   │   ├── tino-{setup,refresh,profile-sync,deep-dive}.md           # MVP
+│   │   └── tino-vibe-{onboard,setup,stack,install}.md               # Onda 1
+│   └── skills/             # Auto-trigger
+│       └── tino-pre-dev-research/
+├── hooks/                  # 2 hooks UserPromptSubmit (Onda 2) + libs core
+│   ├── anti-preguicoso.mjs   # Entry executável
+│   ├── anti-burro.mjs        # Entry executável
+│   └── lib/
+│       ├── hook-context.mjs    # parseStdin + loadPerfil + readStdin
+│       ├── visual-output.mjs   # ANSI box + NO_COLOR fallback
+│       ├── prompt-history.mjs  # jsonl append/readLastN/rotate
+│       └── prompt-analyzer.mjs # heurísticas puras (analyzeLazy + analyzeStuck)
 ├── config/
-│   ├── sources.default.yaml   # 30+ fontes RSS/Atom pré-configuradas
-│   └── prompts/            # Prompts dos subagents (extract-profile, rank-novelty, deep-dive)
-├── lib/                    # Módulos puros, reusados entre scripts
-│   ├── fetch.mjs             # HTTP + retry + timeout
-│   ├── rss-parser.mjs        # Parser RSS/Atom via fast-xml-parser
-│   ├── frontmatter.mjs       # Parse/serialize YAML frontmatter
-│   ├── vault-scanner.mjs     # Scanner de notas do Obsidian
-│   ├── rank-mock.mjs         # Heurística determinística do ranker mock
-│   └── adjustments.mjs       # Leitura do _ajustes.md (feedback loop)
-├── scripts/                # Entradas CLI invocadas pelos comandos
-│   ├── setup.mjs
-│   ├── refresh.mjs
-│   ├── profile-sync.mjs
-│   ├── deep-dive.mjs
-│   ├── fetch-all.mjs
-│   └── rank.mjs
-├── tests/                  # 63 unit tests (node --test)
-│   ├── *.test.mjs
-│   ├── fixtures/             # Fixtures RSS + perfil + _ajustes
-│   └── e2e/                  # 7 specs Playwright (critérios do usuário)
-├── tino-vault-sample/      # Vault de demo — útil pra teste e tutorial
-│   ├── Tino/                 # Saída pronta (perfil + novidades exemplo)
-│   └── perfil-raw/           # Vault "cru" (não-Tino) pra rodar setup contra ele
-├── dashboard.html          # Dashboard single-file (52KB, sem build step)
-├── playwright.config.mjs   # Config do E2E (web server embutido na porta 5174)
-└── package.json            # Scripts: test · test:e2e · test:all · serve
+│   ├── sources.default.yaml          # 30+ fontes RSS/Atom (MVP)
+│   ├── curated-stack.yaml            # Stack vibecoder curado (Onda 0/1)
+│   ├── schemas/
+│   │   ├── perfil-vibecoder.schema.json     # JSON Schema do perfil (Onda 0)
+│   │   └── recomendacao.schema.json         # JSON Schema do recomendacao (Onda 1)
+│   └── prompts/                      # Prompts dos subagents do MVP
+├── lib/                    # Módulos puros (12 arquivos)
+│   ├── fetch.mjs, rss-parser.mjs, frontmatter.mjs, vault-scanner.mjs   # MVP
+│   ├── rank-mock.mjs, adjustments.mjs                                   # MVP
+│   ├── aitmpl-client.mjs, curated-stack.mjs                             # Onda 0
+│   ├── stack-resolver.mjs, recomendacao-render.mjs                      # Onda 1
+│   ├── perfil-vibecoder-writer.mjs, recommender-pipeline.mjs            # Onda 1
+│   ├── claude-md-template.mjs, settings-patch.mjs, install-sh-render.mjs # Onda 1
+│   └── tino-home.mjs                                                    # Onda 2
+├── scripts/                # Entradas CLI do MVP
+│   ├── setup.mjs, refresh.mjs, profile-sync.mjs, deep-dive.mjs
+│   ├── fetch-all.mjs, rank.mjs
+├── tests/                  # 147 unit + integration tests (node --test)
+│   ├── *.test.mjs            # 63 MVP + 24 Onda 0 + 30 Onda 1 + 30 Onda 2
+│   ├── fixtures/             # RSS + perfil + recomendacao + aitmpl mock + curated mock
+│   └── e2e/                  # 7 specs Playwright (critérios do usuário, MVP)
+├── docs/
+│   ├── perfil-vibecoder.md          # Doc humana do schema do perfil
+│   ├── recomendacao-vibecoder.md    # Doc humana do schema do recomendacao
+│   ├── hooks-vibecoder.md           # Uso/debug/desativar dos hooks
+│   ├── superpowers/specs/           # Design docs por onda
+│   ├── superpowers/plans/           # Implementation plans executáveis
+│   └── stories/epics/               # Epic files (epic-executor)
+├── tino-vault-sample/      # Vault de demo
+├── dashboard.html          # Dashboard single-file (52KB)
+├── playwright.config.mjs   # E2E (porta 5174)
+└── package.json            # Scripts: test · test:foundation · test:setup · test:hooks · test:e2e · test:all · serve
 ```
 
 Todos os scripts e libs são ESM puro (`"type": "module"`). Nada de CommonJS, nada de TypeScript, nada de build. `node scripts/X.mjs` roda direto.
