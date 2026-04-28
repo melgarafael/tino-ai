@@ -60,6 +60,15 @@ Comandos individuais (escape hatches):
 
 Tudo respeita o `modo_autonomia` que você escolheu na triagem (`perguntativo` / `balanceado` / `autonomo`). Settings global SEMPRE pede confirmação explícita, mesmo em modo autônomo.
 
+### Hooks runtime (Onda 2)
+
+Depois do setup, dois hooks ficam ativos no seu Claude Code global e te avisam quando voce comete os erros tipicos de iniciante:
+
+- **anti-preguicoso** — prompt curto demais, vago ("isso", "aquilo") ou error paste sem pergunta
+- **anti-burro** — "tenta de novo" sem novo contexto, prompt identico repetido, mesmo erro citado de novo
+
+Comportamento (ativa, agressiva ou silenciosa) eh controlado pelo campo `intervencao_hooks` do seu `Tino/_perfil-vibecoder.md`. Veja [docs/hooks-vibecoder.md](docs/hooks-vibecoder.md) pra detalhes de uso, debug e desativacao.
+
 ---
 
 ## Pré-requisitos
