@@ -181,7 +181,7 @@ Quatro passos. Menos de dois minutos.
 
 ```bash
 # 1. Clone o repo (pode ser em qualquer lugar)
-git clone https://github.com/rafaelmelgaco/tino-ai.git
+git clone https://github.com/melgarafael/tino-ai.git
 cd tino-ai
 
 # 2. Deps do Node
