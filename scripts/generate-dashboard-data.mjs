@@ -90,6 +90,12 @@ async function main() {
         url: String(meta.url || ''),
         favorito: meta.favorito === true,
         body: String(body || ''),
+        tldr: String(meta.tldr || ''),
+        next_step: String(meta.next_step || ''),
+        tradeoff: String(meta.tradeoff || ''),
+        confidence: Number.isFinite(Number(meta.confidence)) ? Number(meta.confidence) : null,
+        read_min: Number.isFinite(Number(meta.read_min)) ? Number(meta.read_min) : null,
+        anchors: Array.isArray(meta.anchors) ? meta.anchors.map(String).filter(Boolean) : [],
       });
     }
     news.sort((a, b) => (b.nota - a.nota) || String(b.data).localeCompare(String(a.data)));

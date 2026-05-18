@@ -147,7 +147,7 @@ async function hasClaudeRanking(outPath) {
 }
 
 function buildMdMeta(item, rank, existingFavorito) {
-  return {
+  const meta = {
     id: String(item.id || ''),
     titulo: String(item.titulo || ''),
     fonte: String(item.fonte || ''),
@@ -160,6 +160,14 @@ function buildMdMeta(item, rank, existingFavorito) {
     url: String(item.url || ''),
     favorito: existingFavorito === true,
   };
+  // Campos do schema rico (v2). Só emite quando o ranker os populou.
+  if (rank.tldr) meta.tldr = String(rank.tldr);
+  if (rank.next_step) meta.next_step = String(rank.next_step);
+  if (rank.tradeoff) meta.tradeoff = String(rank.tradeoff);
+  if (Number.isFinite(Number(rank.confidence))) meta.confidence = Number(rank.confidence);
+  if (Number.isFinite(Number(rank.read_min))) meta.read_min = Number(rank.read_min);
+  if (Array.isArray(rank.anchors) && rank.anchors.length) meta.anchors = rank.anchors.map(String);
+  return meta;
 }
 
 async function ensureDir(dir) {

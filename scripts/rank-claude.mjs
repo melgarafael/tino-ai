@@ -95,13 +95,23 @@ ${perfilText}
 - **Nota 5.0–6.9 (Acompanha)**: interessante mas fora do momento atual.
 - **Nota < 5.0 (Ignore)**: fora do contexto, em evita, ou "ruído da indústria" sem aplicação pro usuário.
 
-## Regra crítica da justificativa
+## Schema "Por que importa pra você" (v2 — campos estruturados)
 
-A justificativa NÃO pode ser genérica. Deve:
-1. Mencionar qual termo/trecho ESPECÍFICO do perfil ativou (ex: "foco_ativo inclui Claude Agent SDK")
-2. Explicar o COMO a novidade se conecta com um projeto/interesse concreto do usuário
-3. Quando der, sugerir uma ação (estudar, migrar código, agendar leitura, descartar)
-4. Zero boilerplate tipo "baseado em heurística", "match determinístico"
+A resposta tem 7 campos por item, cada um com função clara:
+
+1. **tldr** — uma linha (max 110 chars), imperativo, ação concreta. Ex: "Revise sua arquitetura de skills antes de codar — 3-4 podem virar Managed Agents oficiais."
+2. **justificativa** — 2-4 frases em prosa conectando ao contexto do usuário. Nomeie projetos/notas concretos. ZERO boilerplate.
+3. **anchors** — array de 1-3 strings no formato "caminho_no_vault | snippet curto". Múltiplos arquivos quando possível, não só _perfil.md. Ex: ["_perfil.md · foco_ativo | Managed Agents", "tomik-crm/decisoes/fila-webhooks.md | tentativa frustrada com BullMQ"].
+4. **next_step** — uma frase com a próxima ação concreta.
+5. **tradeoff** — string curta com custo/risco. Vazio "" se irrelevante.
+6. **confidence** — número 0-5. 5 = bullseye no foco_ativo + evidência clara no vault. 0 = wild guess.
+7. **read_min** — número 1-15: tempo estimado de leitura da fonte.
+
+Regras críticas:
+- tldr e next_step ESPECÍFICOS pro usuário, não genéricos.
+- anchors deve apontar para arquivos REAIS sempre que possível, com snippet textual.
+- Zero boilerplate tipo "match heurístico", "baseado em".
+- "Ignore" também tem tldr/next_step ("Dispensar — fora do stack atual"); anchors pode ser vazio.
 
 ## Regra da citação (cite)
 
@@ -126,7 +136,13 @@ Responda SOMENTE com um array JSON (sem markdown, sem texto antes ou depois). Ca
   "nota": <number 0-10 com 1 casa decimal>,
   "veredito": "Foca" | "Considera" | "Acompanha" | "Ignore",
   "resumo": "<1 linha curta explicando do que é a novidade>",
+  "tldr": "<ação concreta em 1 linha, imperativo>",
   "justificativa": "<2-4 frases específicas conectando com o perfil>",
+  "anchors": ["<caminho | snippet>", "..."],
+  "next_step": "<próximo passo concreto em 1 frase>",
+  "tradeoff": "<custo ou risco, ou string vazia>",
+  "confidence": <number 0-5>,
+  "read_min": <number 1-15>,
   "cite": "_perfil.md · foco_ativo" | "_perfil.md · identidade" | "_perfil.md · evita"
 }
 \`\`\`
@@ -193,6 +209,13 @@ async function rankAll(vault, args) {
       ranker: 'claude',
       ranked_at: new Date().toISOString().slice(0, 10),
     };
+    // Schema v2 — só grava se Claude retornou.
+    if (r.tldr) newMeta.tldr = String(r.tldr);
+    if (r.next_step) newMeta.next_step = String(r.next_step);
+    if (typeof r.tradeoff === 'string') newMeta.tradeoff = r.tradeoff;
+    if (Number.isFinite(Number(r.confidence))) newMeta.confidence = Number(r.confidence);
+    if (Number.isFinite(Number(r.read_min))) newMeta.read_min = Number(r.read_min);
+    if (Array.isArray(r.anchors)) newMeta.anchors = r.anchors.map(String);
     const body = r.justificativa;
     await fs.writeFile(it.full, serializeFm(newMeta, body), 'utf8');
     return true;

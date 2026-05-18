@@ -110,6 +110,42 @@
   .reason .cite { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-dim); font-style: italic; }
   .reason .cite::before { content: '↳ '; color: var(--accent); font-style: normal; }
 
+  /* ---------------- Why-it-matters v2 (5 blocos) ---------------- */
+  .why { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; background: rgba(212,162,76,0.03); border: 1px solid var(--border-soft); border-left: 2px solid var(--accent-dim); border-radius: 0 4px 4px 0; overflow: hidden; }
+  .why-block { padding: 14px 20px; border-bottom: 1px dashed var(--border-soft); }
+  .why-block:last-child { border-bottom: 0; }
+  .why-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .why-label .ic { display: inline-block; font-style: normal; color: var(--accent); }
+
+  .why-tldr { background: rgba(212,162,76,0.08); }
+  .why-tldr p { font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; line-height: 1.4; color: var(--text); font-weight: 500; letter-spacing: -0.005em; }
+
+  .why-narrative p { font-family: 'Newsreader', serif; font-size: 15px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+
+  .why-anchors ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .why-anchors li { font-size: 13px; line-height: 1.45; color: var(--text-dim); padding-left: 16px; position: relative; }
+  .why-anchors li::before { content: '↳'; position: absolute; left: 0; color: var(--accent-dim); font-size: 12px; }
+  .why-anchors li code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; color: var(--text); background: var(--bg); padding: 1px 5px; border-radius: 2px; border: 1px solid var(--border-soft); }
+  .why-anchors li .snip { color: var(--text-faint); margin-left: 6px; font-style: italic; }
+
+  .why-action { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .why-action > div { display: flex; flex-direction: column; gap: 4px; }
+  .why-action p { font-size: 14px; color: var(--text); line-height: 1.45; }
+  .why-action .a-next { color: var(--high); }
+  .why-action .a-trade { color: var(--text-dim); }
+
+  .why-meta { display: flex; gap: 18px; align-items: center; font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; padding: 10px 20px; background: var(--bg); }
+  .why-meta .meta-item { display: flex; align-items: center; gap: 6px; }
+  .why-meta .conf-bar { display: inline-flex; gap: 2px; }
+  .why-meta .conf-bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--border); display: inline-block; }
+  .why-meta .conf-bar i.on { background: var(--accent); box-shadow: 0 0 6px rgba(212,162,76,0.4); }
+  .why-meta strong { color: var(--text-dim); font-weight: 500; }
+
+  @media (max-width: 720px) {
+    .why-action { grid-template-columns: 1fr; }
+    .why-meta { flex-wrap: wrap; gap: 10px; }
+  }
+
   .expand-actions { display: flex; gap: 4px; flex-wrap: wrap; }
   .act { padding: 8px 14px; font-size: 13px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 3px; transition: all .15s; background: transparent; }
   .act:hover { color: var(--text); border-color: var(--text-dim); }
@@ -165,6 +201,71 @@
   footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap; }
   footer em { font-family: 'Newsreader', serif; font-style: italic; color: var(--text-dim); }
 
+  /* ---------------- Novidades deste refresh ---------------- */
+  .fresh-strip { background: linear-gradient(180deg, rgba(212,162,76,0.08), rgba(212,162,76,0.02)); border: 1px solid var(--accent-dim); border-radius: 4px; padding: 18px 22px; margin: 0 0 32px; }
+  .fresh-strip .fresh-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .fresh-strip h3 { font-family: 'Newsreader', serif; font-style: italic; font-weight: 500; font-size: 18px; color: var(--accent); letter-spacing: -0.01em; }
+  .fresh-strip .ack { font-size: 12px; color: var(--text-dim); padding: 5px 12px; border: 1px solid var(--border); border-radius: 3px; transition: all .15s; }
+  .fresh-strip .ack:hover { color: var(--text); border-color: var(--text-dim); }
+  .fresh-list { display: flex; flex-direction: column; gap: 2px; }
+  .fresh-item { display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: baseline; padding: 8px 4px; border-bottom: 1px dashed var(--border-soft); }
+  .fresh-item:last-child { border-bottom: 0; }
+  .fresh-item .score { font-size: 22px; }
+  .fresh-item .ftitle { font-family: 'Newsreader', serif; font-size: 16px; color: var(--text); cursor: pointer; }
+  .fresh-item .ftitle:hover { color: var(--accent); }
+  .fresh-item .fmeta { font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; text-transform: uppercase; }
+  .new-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: 2px; box-shadow: 0 0 8px rgba(212,162,76,0.5); }
+
+  /* ---------------- Toolbar de filtros ---------------- */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 0 0 28px; padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 4px; }
+  .toolbar .tb-group { display: flex; align-items: center; gap: 6px; }
+  .toolbar .tb-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin-right: 4px; }
+  .toolbar input[type="search"], .toolbar select { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 3px; padding: 6px 10px; font: inherit; font-size: 13px; }
+  .toolbar input[type="search"] { min-width: 200px; }
+  .toolbar input[type="search"]:focus, .toolbar select:focus { border-color: var(--accent-dim); outline: none; }
+  .toolbar .pill { padding: 4px 10px; font-size: 12px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; transition: all .15s; }
+  .toolbar .pill:hover { color: var(--text); border-color: var(--text-dim); }
+  .toolbar .pill.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(212,162,76,0.1); }
+  .toolbar .tb-clear { color: var(--text-faint); font-size: 12px; padding: 4px 8px; }
+  .toolbar .tb-clear:hover { color: var(--text-dim); }
+  .toolbar .tb-spacer { flex: 1; }
+  .filter-summary { margin: 0 0 18px; font-size: 13px; color: var(--text-dim); font-feature-settings: 'tnum'; }
+  .filter-summary strong { color: var(--text); font-weight: 500; }
+
+  /* ---------------- Seções colapsáveis ---------------- */
+  .section-head.collapsible { cursor: pointer; user-select: none; }
+  .section-head.collapsible:hover h2 { color: var(--accent); }
+  .section-head .chev-sec { display: inline-block; transition: transform .2s; color: var(--text-faint); margin-right: 8px; font-size: 14px; }
+  .section-head.collapsed .chev-sec { transform: rotate(-90deg); }
+  .section-body { animation: fade .2s ease; }
+  .section-body.hidden { display: none; }
+  .section-head .count-badge { font-size: 11px; color: var(--text-dim); background: var(--bg-elev); padding: 2px 8px; border-radius: 999px; margin-left: 8px; font-feature-settings: 'tnum'; }
+
+  /* ---------------- Card: badge "novo" + botão dispensar ---------------- */
+  .card .new-flag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 2px; padding: 1px 6px; margin-right: 10px; vertical-align: 2px; background: rgba(212,162,76,0.08); }
+  .act.dismiss { color: var(--text-faint); border-color: var(--border); }
+  .act.dismiss:hover { color: var(--danger); border-color: var(--danger); }
+  .act.dismiss::before { content: '✕ '; }
+
+  .dismissed-bar { margin-top: 24px; padding: 10px 16px; background: var(--bg-card); border: 1px dashed var(--border); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-dim); }
+  .dismissed-bar button { color: var(--accent); border: 1px solid var(--accent-dim); padding: 4px 10px; border-radius: 3px; font-size: 12px; }
+  .dismissed-bar button:hover { background: var(--accent); color: var(--bg); }
+
+  /* ---------------- Indicador de atualidade ---------------- */
+  .freshness { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin: 0 0 24px; border-radius: 4px; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-soft); color: var(--text-dim); flex-wrap: wrap; }
+  .freshness .age-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--high); box-shadow: 0 0 8px rgba(143,177,116,0.4); flex-shrink: 0; }
+  .freshness.stale { border-color: var(--accent-dim); background: rgba(212,162,76,0.06); color: var(--text); }
+  .freshness.stale .age-dot { background: var(--accent); box-shadow: 0 0 10px rgba(212,162,76,0.5); }
+  .freshness.very-stale { border-color: var(--danger); background: rgba(183,100,84,0.06); }
+  .freshness.very-stale .age-dot { background: var(--danger); box-shadow: 0 0 10px rgba(183,100,84,0.5); }
+  .freshness strong { color: var(--text); font-weight: 500; }
+  .freshness .nudge { color: var(--text-faint); }
+  .freshness .nudge code { background: var(--bg); padding: 2px 6px; border-radius: 2px; color: var(--accent); border: 1px solid var(--border); margin-left: 4px; }
+  .freshness .spacer { flex: 1; }
+
+  .no-results { padding: 48px 20px; text-align: center; color: var(--text-dim); border: 1px dashed var(--border); border-radius: 4px; }
+  .no-results h3 { font-family: 'Newsreader', serif; font-style: italic; font-size: 20px; color: var(--text); margin-bottom: 8px; }
+
   @media (max-width: 720px) {
     .container { padding: 32px 20px 64px; }
     .brand { font-size: 36px; }
@@ -192,7 +293,7 @@
     <div class="status" id="status"></div>
   </div>
   <nav class="tabs" role="tablist">
-    <button class="tab active" data-view="today">Hoje <span class="count" id="count-today">0</span></button>
+    <button class="tab active" data-view="today">Foco <span class="count" id="count-today">0</span></button>
     <button class="tab" data-view="favorites">Favoritos <span class="count" id="count-fav">0</span></button>
     <button class="tab" data-view="profile">Perfil</button>
     <button class="tab" data-view="settings">Config</button>
@@ -243,6 +344,16 @@ function el(tag, attrs, ...children) {
 }
 function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
+function metaRow(parts) {
+  const row = el('div', { class: 'card-meta' });
+  const kept = parts.filter(p => p != null);
+  kept.forEach((p, i) => {
+    if (i > 0) row.appendChild(el('span', { class: 'sep', text: '·' }));
+    row.appendChild(p);
+  });
+  return row;
+}
+
 function mdInline(text) {
   const out = [];
   const src = String(text || '');
@@ -280,16 +391,57 @@ const MOCK_PROFILE = {
 };
 const MOCK_CONFIG = { meta: { fontes_ativas: 25, fontes_inativas: 4, frequencia: '1–2× por dia', vault_subpasta: 'Tino' } };
 const MOCK_NEWS = [
-  { id: '2026-04-21-claude-managed-agents', titulo: 'Claude Managed Agents entra em GA', fonte: 'Anthropic Blog', data: '2026-04-21', tipo: 'release', nota: 9.4, veredito: 'Foca', resumo: 'Infra oficial de orquestração multi-agente Claude — aplicável direto ao pipeline que você está construindo no próprio Tino.', cite: 'projetos/tino-ai/arquitetura_backend.md', url: '', favorito: false,
-    body: 'Você está construindo o Tino usando Claude Code como backend de skills e subagents.\nManaged Agents resolve nativamente orquestração, retries e state — o que você ia implementar manualmente na camada de filesystem. Substituição potencial direta de 3-4 skills do Tino por chamadas oficiais.' },
-  { id: '2026-04-20-claude-sdk-1', titulo: 'Claude Agent SDK 1.0 estável', fonte: 'Anthropic Engineering', data: '2026-04-20', tipo: 'release', nota: 9.1, veredito: 'Foca', resumo: 'SDK oficial sai de beta — hooks, custom tools, permissions estabilizados. Você marcou isso como foco de estudo atual.', cite: 'aprendizado/claude-agent-sdk.md · foco ativo', url: '', favorito: false,
-    body: 'Seu vault marca "estudando Claude Agent SDK" em foco-ativo.md. O 1.0 quebra a API em alguns pontos (hooks renomeados, permission mode inverted) — se você ainda não tocou nos exemplos dos últimos 30 dias, vale revisar antes de codar em cima. Bônus: agora suporta Bun nativamente.' },
-  { id: '2026-04-19-vercel-workflow', titulo: 'Vercel Workflow DevKit chega em GA', fonte: 'Vercel Changelog', data: '2026-04-19', tipo: 'release', nota: 8.2, veredito: 'Considera', resumo: 'Workflows duráveis com pause/resume, retries e state. Alternativa ao BullMQ que você tentou no Tomik.', cite: 'tomik-crm/decisoes/fila-webhooks.md · 2026-03-18', url: '', favorito: false,
-    body: 'Seu vault registra tentativa frustrada com BullMQ no Tomik CRM em março. WDK resolve os problemas de state perdida e retries configuráveis que você documentou. Mas: depende de estar na Vercel — o próprio Tino não vai usar (roda local), mas o Tomik sim pode se beneficiar.' },
-  { id: '2026-04-17-langchain-context-spec', titulo: 'Context Engineering Spec v1 publicada', fonte: 'LangChain Blog', data: '2026-04-17', tipo: 'framework', nota: 7.8, veredito: 'Considera', resumo: 'Formalização do que você já pratica empiricamente — nomenclatura comum acelera conversas com a comunidade.', cite: 'circuito-realidade/context-engineering/_INDEX.md', url: '', favorito: false,
-    body: 'Seu vault tem 40+ notas sobre como você organiza contexto para agentes. A spec convergiu em vocabulário próximo ao seu — vale alinhar os termos que você criou com os oficiais antes de publicar seu material.' },
-  { id: '2026-04-18-supabase-realtime', titulo: 'Supabase Realtime Presence v2', fonte: 'Supabase Changelog', data: '2026-04-18', tipo: 'release', nota: 7.1, veredito: 'Considera', resumo: 'API de presença mais performática — aplicável ao módulo de colaboração do Tomik, sem urgência.', cite: 'tomik-crm/bugs/presenca-fantasma.md · status aberto', url: '', favorito: false,
-    body: 'Tomik usa Supabase Realtime para indicadores "quem está vendo este lead". A v2 baixa latência pela metade e resolve o bug de presença fantasma que você registrou. Não é prioridade, mas vale agendar para o próximo ciclo de manutenção.' },
+  { id: '2026-04-21-claude-managed-agents', titulo: 'Claude Managed Agents entra em GA', fonte: 'Anthropic Blog', data: '2026-04-21', tipo: 'release', nota: 9.4, veredito: 'Foca', resumo: 'Infra oficial de orquestração multi-agente Claude — aplicável direto ao pipeline que você está construindo no próprio Tino.', cite: '_perfil.md · foco_ativo', url: '', favorito: false,
+    tldr: 'Revise sua arquitetura de skills do Tino antes de codar — 3-4 podem virar chamadas Managed Agents oficiais.',
+    body: 'Você está construindo o Tino usando Claude Code como backend de skills e subagents. Managed Agents resolve nativamente orquestração, retries e state — o que você ia implementar manualmente na camada de filesystem. Substituição potencial direta de 3-4 skills do Tino por chamadas oficiais.',
+    anchors: [
+      'projetos/tino-ai/arquitetura_backend.md | skills manuais que substituiriam',
+      '_perfil.md · foco_ativo | Managed Agents (estudo ativo há 14 dias)',
+      '_ajustes.md · Certeiros | 3 thumbs-up recentes em SDK/agents'
+    ],
+    next_step: 'Ler exemplos de migration esta semana; decisão na próxima sprint.',
+    tradeoff: 'Lock-in Anthropic (você já assumiu) · custo por execução vs filesystem free.',
+    confidence: 5, read_min: 6 },
+  { id: '2026-04-20-claude-sdk-1', titulo: 'Claude Agent SDK 1.0 estável', fonte: 'Anthropic Engineering', data: '2026-04-20', tipo: 'release', nota: 9.1, veredito: 'Foca', resumo: 'SDK oficial sai de beta — hooks, custom tools, permissions estabilizados.', cite: '_perfil.md · foco_ativo', url: '', favorito: false,
+    tldr: 'Revise seus exemplos antes de codar — 1.0 quebra API de hooks e permission mode.',
+    body: 'Seu vault marca "estudando Claude Agent SDK" em foco-ativo. O 1.0 quebra a API em alguns pontos (hooks renomeados, permission mode inverted) — se você ainda não tocou nos exemplos dos últimos 30 dias, vale revisar antes de codar em cima. Bônus: agora suporta Bun nativamente.',
+    anchors: [
+      'aprendizado/claude-agent-sdk.md | "estudando Claude Agent SDK" (foco ativo)',
+      '_perfil.md · foco_ativo | Claude Agent SDK'
+    ],
+    next_step: 'Comparar diff da API com seu código atual antes do próximo commit.',
+    tradeoff: 'Migração de hooks tem ~2h de retrabalho.',
+    confidence: 5, read_min: 8 },
+  { id: '2026-04-19-vercel-workflow', titulo: 'Vercel Workflow DevKit chega em GA', fonte: 'Vercel Changelog', data: '2026-04-19', tipo: 'release', nota: 8.2, veredito: 'Considera', resumo: 'Workflows duráveis com pause/resume, retries e state.', cite: 'tomik-crm/decisoes/fila-webhooks.md', url: '', favorito: false,
+    tldr: 'Pode resolver o problema de fila do Tomik — avaliar no próximo ciclo de manutenção.',
+    body: 'Seu vault registra tentativa frustrada com BullMQ no Tomik CRM em março. WDK resolve os problemas de state perdida e retries configuráveis que você documentou. Mas: depende de estar na Vercel — o próprio Tino não vai usar (roda local), mas o Tomik sim pode se beneficiar.',
+    anchors: [
+      'tomik-crm/decisoes/fila-webhooks.md | tentativa frustrada com BullMQ (2026-03-18)',
+      'tomik-crm/bugs/state-perdida.md | bug aberto há 6 semanas'
+    ],
+    next_step: 'Spike de 2h no próximo ciclo pra validar se cobre os casos do Tomik.',
+    tradeoff: 'Acopla Tomik ao Vercel — você queria portabilidade.',
+    confidence: 4, read_min: 5 },
+  { id: '2026-04-17-langchain-context-spec', titulo: 'Context Engineering Spec v1 publicada', fonte: 'LangChain Blog', data: '2026-04-17', tipo: 'framework', nota: 7.8, veredito: 'Considera', resumo: 'Formalização do que você já pratica empiricamente.', cite: 'circuito-realidade/context-engineering/_INDEX.md', url: '', favorito: false,
+    tldr: 'Alinhe seu vocabulário próprio com a spec oficial antes de publicar seu material.',
+    body: 'Seu vault tem 40+ notas sobre como você organiza contexto para agentes. A spec convergiu em vocabulário próximo ao seu — vale alinhar os termos que você criou com os oficiais antes de publicar seu material.',
+    anchors: [
+      'circuito-realidade/context-engineering/_INDEX.md | 40+ notas existentes',
+      '_perfil.md · identidade | "publica conteúdo educacional"'
+    ],
+    next_step: 'Comparar glossário seu vs oficial; renomear o que divergir.',
+    tradeoff: '',
+    confidence: 3, read_min: 7 },
+  { id: '2026-04-18-supabase-realtime', titulo: 'Supabase Realtime Presence v2', fonte: 'Supabase Changelog', data: '2026-04-18', tipo: 'release', nota: 7.1, veredito: 'Considera', resumo: 'API de presença mais performática — aplicável ao módulo de colaboração do Tomik.', cite: 'tomik-crm/bugs/presenca-fantasma.md', url: '', favorito: false,
+    tldr: 'Agendar pro próximo ciclo de manutenção — resolve seu bug de presença fantasma.',
+    body: 'Tomik usa Supabase Realtime para indicadores "quem está vendo este lead". A v2 baixa latência pela metade e resolve o bug de presença fantasma que você registrou. Não é prioridade, mas vale agendar para o próximo ciclo de manutenção.',
+    anchors: [
+      'tomik-crm/bugs/presenca-fantasma.md | status aberto, P2',
+      '_perfil.md · identidade | "SaaS B2B com colaboração em tempo real"'
+    ],
+    next_step: 'Adicionar ao backlog do próximo ciclo; migração estimada em 1 PR.',
+    tradeoff: 'Migração obriga reset de conexões ativas — janela de manutenção curta.',
+    confidence: 4, read_min: 4 },
   { id: '2026-04-16-copilot-workspace', titulo: 'GitHub Copilot Workspace agora suporta agentes customizados', fonte: 'GitHub Blog', data: '2026-04-16', tipo: 'release', nota: 5.1, veredito: 'Ignore', resumo: 'Você não usa Copilot — seu fluxo é Claude Code. Informação de mercado apenas.', cite: '', url: '', favorito: false, body: '' },
   { id: '2026-04-18-gemini-flash-thinking', titulo: 'Gemini 2.5 Flash ganha modo thinking', fonte: 'Google DeepMind', data: '2026-04-18', tipo: 'release', nota: 4.5, veredito: 'Ignore', resumo: 'Sem projeto ativo em Gemini. Reavaliação sugerida quando for benchmarkar providers.', cite: '', url: '', favorito: false, body: '' },
   { id: '2026-04-15-openai-audio', titulo: 'OpenAI Realtime API expande áudio para 12 línguas', fonte: 'OpenAI Blog', data: '2026-04-15', tipo: 'release', nota: 3.8, veredito: 'Ignore', resumo: 'Zero projetos seus envolvem áudio. Pode descartar.', cite: '', url: '', favorito: false, body: '' },
@@ -300,9 +452,76 @@ const MOCK_NEWS = [
 const state = {
   vaultHandle: null, tinoHandle: null,
   mode: 'demo', vaultName: null,
-  data: { news: clone(MOCK_NEWS), profile: clone(MOCK_PROFILE), config: clone(MOCK_CONFIG) }
+  data: { news: clone(MOCK_NEWS), profile: clone(MOCK_PROFILE), config: clone(MOCK_CONFIG) },
+  filters: { fonte: '', tipo: '', janela: 'all', q: '' },
+  collapsed: { considera: true, ignore: true },
+  dismissed: new Set(),
+  lastSeenAt: 0,
+  showDismissed: false,
 };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+/* ---------------- localStorage (estado leve do client) ---------------- */
+const LS_KEYS = { lastSeen: 'tino:lastSeenAt', dismissed: 'tino:dismissed', filters: 'tino:filters', collapsed: 'tino:collapsed' };
+function lsRead(key, fallback) {
+  try { const v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); }
+  catch { return fallback; }
+}
+function lsWrite(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+function loadClientState() {
+  state.lastSeenAt = Number(lsRead(LS_KEYS.lastSeen, 0)) || 0;
+  state.dismissed = new Set(lsRead(LS_KEYS.dismissed, []));
+  const f = lsRead(LS_KEYS.filters, null);
+  if (f && typeof f === 'object') state.filters = Object.assign(state.filters, f);
+  const c = lsRead(LS_KEYS.collapsed, null);
+  if (c && typeof c === 'object') state.collapsed = Object.assign(state.collapsed, c);
+}
+function persistDismissed() { lsWrite(LS_KEYS.dismissed, Array.from(state.dismissed)); }
+function persistFilters() { lsWrite(LS_KEYS.filters, state.filters); }
+function persistCollapsed() { lsWrite(LS_KEYS.collapsed, state.collapsed); }
+function persistLastSeen() { lsWrite(LS_KEYS.lastSeen, state.lastSeenAt); }
+
+function ingestedAt(n) { return Number(n._lastModified || 0) || (n.data ? Date.parse(n.data) || 0 : 0); }
+function maxIngestedAt(news) { return news.reduce((acc, n) => Math.max(acc, ingestedAt(n)), 0); }
+function isFresh(n) { return state.lastSeenAt > 0 && ingestedAt(n) > state.lastSeenAt; }
+
+/* ---------------- Date formatting (pt-BR) ---------------- */
+const DATE_FMT_BR = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+const DATE_FMT_BR_SHORT = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long' });
+function parseToDate(iso) {
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  return isFinite(t) ? new Date(t) : null;
+}
+function formatDateBR(iso, { withYear = true } = {}) {
+  const d = parseToDate(iso);
+  if (!d) return String(iso || '');
+  return (withYear ? DATE_FMT_BR : DATE_FMT_BR_SHORT).format(d);
+}
+function relativeFromNow(iso, now = Date.now()) {
+  const d = parseToDate(iso);
+  if (!d) return '';
+  const startOf = ts => { const x = new Date(ts); x.setHours(0,0,0,0); return x.getTime(); };
+  const diffDays = Math.round((startOf(now) - startOf(d.getTime())) / 86400000);
+  if (diffDays === 0) return 'hoje';
+  if (diffDays === 1) return 'ontem';
+  if (diffDays < 0) return diffDays === -1 ? 'amanhã' : `em ${-diffDays} dias`;
+  if (diffDays < 30) return `há ${diffDays} dias`;
+  if (diffDays < 60) return 'há 1 mês';
+  if (diffDays < 365) return `há ${Math.round(diffDays / 30)} meses`;
+  return `há ${Math.round(diffDays / 365)} ${Math.round(diffDays / 365) === 1 ? 'ano' : 'anos'}`;
+}
+function lastRefreshAt(news) {
+  // Prefere _lastModified (vault real). Fallback: max(data) do dataset.
+  let maxLm = 0, maxData = 0;
+  for (const n of news) {
+    if (n._lastModified) maxLm = Math.max(maxLm, Number(n._lastModified));
+    if (n.data) { const t = Date.parse(n.data); if (isFinite(t)) maxData = Math.max(maxData, t); }
+  }
+  return maxLm || maxData || 0;
+}
 
 /* ---------------- IndexedDB (persistência do handle do vault) ---------------- */
 function openDB() {
@@ -490,7 +709,14 @@ async function loadFromVault() {
           url: String(parsed.meta.url || ''),
           favorito: parsed.meta.favorito === true,
           body: parsed.body,
-          _filename: name
+          tldr: String(parsed.meta.tldr || ''),
+          next_step: String(parsed.meta.next_step || ''),
+          tradeoff: String(parsed.meta.tradeoff || ''),
+          confidence: Number.isFinite(Number(parsed.meta.confidence)) ? Number(parsed.meta.confidence) : null,
+          read_min: Number.isFinite(Number(parsed.meta.read_min)) ? Number(parsed.meta.read_min) : null,
+          anchors: Array.isArray(parsed.meta.anchors) ? parsed.meta.anchors.map(String).filter(Boolean) : [],
+          _filename: name,
+          _lastModified: file.lastModified || 0
         });
         diag.parsed += 1;
       } catch (e) {
@@ -776,8 +1002,9 @@ function renderStatus() {
 }
 
 function updateCounts() {
-  const highlights = state.data.news.filter(n => n.nota >= 7).length;
-  document.getElementById('count-today').textContent = String(highlights || state.data.news.length);
+  const visible = state.data.news.filter(n => !state.dismissed.has(n.id));
+  const highlights = visible.filter(n => n.nota >= 7).length;
+  document.getElementById('count-today').textContent = String(highlights || visible.length);
   document.getElementById('count-fav').textContent = String(state.data.news.filter(n => n.favorito).length);
 }
 
@@ -789,37 +1016,120 @@ function sectionHead(titlePlainBefore, emphasized, titlePlainAfter, hint) {
   return el('div', { class: 'section-head' }, h, hint ? el('span', { class: 'hint', text: hint }) : null);
 }
 
+function parseAnchor(s) {
+  const m = String(s || '').split('|');
+  return { path: (m[0] || '').trim(), snippet: (m[1] || '').trim() };
+}
+
+function renderWhyLegacy(n) {
+  return el('div', { class: 'reason' },
+    el('div', { class: 'label', text: 'Por que importa para você' }),
+    n.body ? el('p', { text: n.body }) : null,
+    n.cite ? el('span', { class: 'cite' }, 'Obsidian · ', el('em', { text: n.cite })) : null
+  );
+}
+
+function renderWhyRich(n) {
+  const why = el('div', { class: 'why' });
+
+  if (n.tldr) {
+    why.appendChild(el('div', { class: 'why-block why-tldr' },
+      el('div', { class: 'why-label' }, el('span', { class: 'ic', text: '✱' }), 'Pra você, agora'),
+      el('p', { text: n.tldr })
+    ));
+  }
+
+  if (n.body) {
+    why.appendChild(el('div', { class: 'why-block why-narrative' },
+      el('div', { class: 'why-label' }, 'Conexão com seu contexto'),
+      el('p', { text: n.body })
+    ));
+  }
+
+  if (n.anchors && n.anchors.length) {
+    const ul = el('ul');
+    n.anchors.forEach(raw => {
+      const a = parseAnchor(raw);
+      const li = el('li', null, el('code', { text: a.path }));
+      if (a.snippet) li.appendChild(el('span', { class: 'snip', text: '— ' + a.snippet }));
+      ul.appendChild(li);
+    });
+    why.appendChild(el('div', { class: 'why-block why-anchors' },
+      el('div', { class: 'why-label' }, el('span', { class: 'ic', text: '📎' }), 'Ancora em'),
+      ul
+    ));
+  }
+
+  if (n.next_step || n.tradeoff) {
+    const grid = el('div', { class: 'why-action' });
+    if (n.next_step) grid.appendChild(el('div', null,
+      el('div', { class: 'why-label' }, el('span', { class: 'ic', text: '→' }), 'Próximo passo'),
+      el('p', { class: 'a-next', text: n.next_step })
+    ));
+    if (n.tradeoff) grid.appendChild(el('div', null,
+      el('div', { class: 'why-label' }, el('span', { class: 'ic', text: '⚖' }), 'Trade-off'),
+      el('p', { class: 'a-trade', text: n.tradeoff })
+    ));
+    why.appendChild(el('div', { class: 'why-block' }, grid));
+  }
+
+  // Meta (confiança + tempo de leitura + cite legado)
+  const metaParts = [];
+  if (Number.isFinite(n.confidence)) {
+    const bar = el('span', { class: 'conf-bar' });
+    const lvl = Math.max(0, Math.min(5, Math.round(n.confidence)));
+    for (let i = 0; i < 5; i++) bar.appendChild(el('i', { class: i < lvl ? 'on' : '' }));
+    metaParts.push(el('span', { class: 'meta-item' }, el('strong', { text: 'Confiança' }), bar));
+  }
+  if (Number.isFinite(n.read_min) && n.read_min > 0) {
+    metaParts.push(el('span', { class: 'meta-item' }, el('strong', { text: `${n.read_min} min de leitura` })));
+  }
+  if (n.cite) metaParts.push(el('span', { class: 'meta-item' }, el('strong', { text: 'cite:' }), el('em', { text: n.cite })));
+  if (metaParts.length) {
+    const meta = el('div', { class: 'why-meta' });
+    metaParts.forEach(p => meta.appendChild(p));
+    why.appendChild(meta);
+  }
+
+  return why;
+}
+
 function card(n) {
-  const expandable = Boolean(n.body || n.cite);
   const scoreDiv = el('div', { class: 'score-col' },
     el('span', { class: `score ${scoreClass(n.nota)}`, text: Number(n.nota).toFixed(1) }),
     el('span', { class: 'score-label', text: 'nota' })
   );
 
+  const fresh = isFresh(n);
+  const titleNode = el('h3');
+  if (fresh) titleNode.appendChild(el('span', { class: 'new-flag', text: 'novo' }));
+  titleNode.appendChild(document.createTextNode(n.titulo));
+
   const body = el('div', { class: 'card-body' },
-    el('h3', { text: n.titulo }),
-    n.fonte ? el('div', { class: 'card-meta' },
+    titleNode,
+    n.fonte ? metaRow([
       el('span', { class: 'source', text: n.fonte }),
-      el('span', { class: 'sep', text: '·' }),
-      el('span', { text: `${n.tipo || ''}${n.data ? ' · ' + n.data : ''}` })
-    ) : null,
+      n.tipo ? el('span', { text: n.tipo }) : null,
+      n.data ? el('span', { text: formatDateBR(n.data) }) : null,
+      n.data ? el('span', { style: 'color:var(--text-faint)', text: relativeFromNow(n.data) }) : null
+    ]) : null,
     el('p', { class: 'verdict' },
       el('span', { class: `tag ${tagClass(n.veredito)}`, text: n.veredito }),
       n.resumo
     )
   );
 
+  const hasRichWhy = !!(n.tldr || n.next_step || n.tradeoff || (n.anchors && n.anchors.length) || Number.isFinite(n.confidence) || Number.isFinite(n.read_min));
+  const expandable = Boolean(hasRichWhy || n.body || n.cite);
+
   if (expandable) {
-    const reason = n.body ? el('div', { class: 'reason' },
-      el('div', { class: 'label', text: 'Por que importa para você' }),
-      el('p', { text: n.body }),
-      n.cite ? el('span', { class: 'cite' }, 'Obsidian · ', el('em', { text: n.cite })) : null
-    ) : null;
+    const reason = hasRichWhy ? renderWhyRich(n) : (n.body || n.cite ? renderWhyLegacy(n) : null);
 
     const actions = el('div', { class: 'expand-actions' },
       el('button', { class: 'act primary' + (n.favorito ? ' active' : ''), 'data-fav': n.id, text: n.favorito ? 'Favoritado' : 'Favoritar' }),
       el('button', { class: 'act thumb up', 'data-thumb': 'up', 'data-id': n.id, 'data-titulo': n.titulo, text: 'Certeiro' }),
       el('button', { class: 'act thumb down', 'data-thumb': 'down', 'data-id': n.id, 'data-titulo': n.titulo, text: 'Errou' }),
+      el('button', { class: 'act dismiss', 'data-dismiss': n.id, text: 'Dispensar' }),
       isSafeUrl(n.url) ? el('a', { class: 'act', href: n.url, target: '_blank', rel: 'noopener', text: 'Abrir fonte' }) : null
     );
 
@@ -842,10 +1152,6 @@ function cardsList(items, extraClass) {
 function renderToday() {
   const root = document.getElementById('today');
   clear(root);
-  const foco = state.data.news.filter(n => n.nota >= 9);
-  const consid = state.data.news.filter(n => n.nota >= 7 && n.nota < 9);
-  const ignore = state.data.news.filter(n => n.nota < 7);
-  const relevantes = foco.length + consid.length;
   const total = state.data.news.length;
 
   if (total === 0) {
@@ -941,18 +1247,240 @@ function renderToday() {
     return;
   }
 
-  root.appendChild(el('div', { class: 'calm' },
-    el('p', null,
-      'Você está em dia. ',
-      el('strong', { text: `${relevantes} ${relevantes === 1 ? 'novidade' : 'novidades'}` }),
-      ` ${relevantes === 1 ? 'merece' : 'merecem'} teu foco hoje de ${total} analisadas. As demais podem ser ignoradas com tranquilidade.`,
-      el('span', { class: 'sub', text: 'Tino lê seu vault Obsidian, monitora suas fontes configuradas e ranqueia o que é realmente relevante para o seu momento.' })
-    )
-  ));
+  // [legacy block — substituído por novo pipeline abaixo]
+  renderTodayV2(root);
+}
 
-  if (foco.length) { root.appendChild(sectionHead('', 'Focar', ' hoje', 'nota 9+ · altamente aplicável')); root.appendChild(cardsList(foco)); }
-  if (consid.length) { root.appendChild(sectionHead('', 'Considerar', '', 'nota 7–8.9 · relevante contextual')); root.appendChild(cardsList(consid)); }
-  if (ignore.length) { root.appendChild(sectionHead('', 'Ignorar', ' por ora', 'nota < 7 · fora do seu contexto atual')); root.appendChild(cardsList(ignore, 'ignored')); }
+function applyFilters(list) {
+  const f = state.filters;
+  const now = Date.now();
+  const windowMs = f.janela === '7d' ? 7 * 86400000 : f.janela === '30d' ? 30 * 86400000 : null;
+  const q = String(f.q || '').trim().toLowerCase();
+  return list.filter(n => {
+    if (f.fonte && n.fonte !== f.fonte) return false;
+    if (f.tipo && n.tipo !== f.tipo) return false;
+    if (windowMs) {
+      const t = n.data ? Date.parse(n.data) : 0;
+      if (!t || (now - t) > windowMs) return false;
+    }
+    if (q) {
+      const hay = `${n.titulo} ${n.resumo} ${n.body || ''} ${n.fonte} ${n.tipo}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderToolbar() {
+  const tb = el('div', { class: 'toolbar' });
+  const fontes = Array.from(new Set(state.data.news.map(n => n.fonte).filter(Boolean))).sort();
+  const tipos = Array.from(new Set(state.data.news.map(n => n.tipo).filter(Boolean))).sort();
+  const f = state.filters;
+
+  const search = el('input', { type: 'search', placeholder: 'Buscar por título, resumo, fonte…', value: f.q });
+  search.addEventListener('input', () => { state.filters.q = search.value; persistFilters(); renderToday(); search.focus(); });
+
+  const fonteSel = el('select');
+  fonteSel.appendChild(el('option', { value: '', text: 'Todas as fontes' }));
+  fontes.forEach(s => { const o = el('option', { value: s, text: s }); if (s === f.fonte) o.selected = true; fonteSel.appendChild(o); });
+  fonteSel.addEventListener('change', () => { state.filters.fonte = fonteSel.value; persistFilters(); renderToday(); });
+
+  const tipoSel = el('select');
+  tipoSel.appendChild(el('option', { value: '', text: 'Todos os tipos' }));
+  tipos.forEach(s => { const o = el('option', { value: s, text: s }); if (s === f.tipo) o.selected = true; tipoSel.appendChild(o); });
+  tipoSel.addEventListener('change', () => { state.filters.tipo = tipoSel.value; persistFilters(); renderToday(); });
+
+  const janelaGroup = el('div', { class: 'tb-group' }, el('span', { class: 'tb-label', text: 'janela' }));
+  ['7d', '30d', 'all'].forEach(w => {
+    const labels = { '7d': '7 dias', '30d': '30 dias', 'all': 'tudo' };
+    const p = el('button', { class: 'pill' + (f.janela === w ? ' active' : ''), text: labels[w] });
+    p.addEventListener('click', () => { state.filters.janela = w; persistFilters(); renderToday(); });
+    janelaGroup.appendChild(p);
+  });
+
+  const hasAny = f.q || f.fonte || f.tipo || f.janela !== 'all';
+  const clearBtn = el('button', { class: 'tb-clear', text: 'limpar filtros' });
+  clearBtn.addEventListener('click', () => { state.filters = { fonte: '', tipo: '', janela: 'all', q: '' }; persistFilters(); renderToday(); });
+
+  const parts = [
+    el('span', { class: 'tb-label', text: 'filtrar' }),
+    search,
+    fonteSel,
+    tipoSel,
+    janelaGroup,
+    el('span', { class: 'tb-spacer' })
+  ];
+  if (hasAny) parts.push(clearBtn);
+  tb.append(...parts);
+  return tb;
+}
+
+function renderTodayV2(root) {
+  const allNews = state.data.news;
+  const totalAll = allNews.length;
+  const dismissedCount = allNews.filter(n => state.dismissed.has(n.id)).length;
+  const freshCount = allNews.filter(n => isFresh(n) && !state.dismissed.has(n.id)).length;
+
+  // 1) Calm intro — honesto sobre o que é novo
+  const calmIntro = el('div', { class: 'calm' });
+  const calmP = el('p');
+  if (freshCount > 0) {
+    calmP.appendChild(document.createTextNode('Desde o último ciclo, '));
+    calmP.appendChild(el('strong', { text: `${freshCount} ${freshCount === 1 ? 'novidade nova' : 'novidades novas'}` }));
+    calmP.appendChild(document.createTextNode(` ${freshCount === 1 ? 'apareceu' : 'apareceram'} no seu radar.`));
+  } else if (state.lastSeenAt === 0) {
+    calmP.appendChild(el('strong', { text: `${totalAll} novidades` }));
+    calmP.appendChild(document.createTextNode(' acumuladas. Use os filtros abaixo para focar no que importa.'));
+  } else {
+    calmP.appendChild(document.createTextNode('Você está em dia. '));
+    calmP.appendChild(el('strong', { text: 'Nenhuma novidade nova' }));
+    calmP.appendChild(document.createTextNode(' desde o último ciclo.'));
+  }
+  calmP.appendChild(el('span', { class: 'sub', text: `${totalAll} acumuladas no total · ${dismissedCount} dispensadas. Tino lê seu vault Obsidian e ranqueia o que é relevante para seu momento.` }));
+  calmIntro.appendChild(calmP);
+  root.appendChild(calmIntro);
+
+  // 1.5) Banner de atualidade — quando foi o último refresh?
+  const refreshTs = lastRefreshAt(allNews);
+  if (refreshTs > 0) {
+    const days = Math.floor((Date.now() - refreshTs) / 86400000);
+    const rel = relativeFromNow(new Date(refreshTs).toISOString());
+    const cls = days >= 14 ? 'very-stale' : days >= 5 ? 'stale' : '';
+    const banner = el('div', { class: 'freshness' + (cls ? ' ' + cls : '') });
+    banner.appendChild(el('span', { class: 'age-dot' }));
+    const main = el('span');
+    main.append('Último refresh: ', el('strong', { text: formatDateBR(new Date(refreshTs).toISOString()) }), ` · ${rel}`);
+    banner.appendChild(main);
+    banner.appendChild(el('span', { class: 'spacer' }));
+    if (cls) {
+      const nudge = el('span', { class: 'nudge' });
+      nudge.append(
+        days >= 14 ? 'Seu radar está desatualizado — rode' : 'Pode valer rodar',
+        el('code', { text: '/tino:refresh' })
+      );
+      banner.appendChild(nudge);
+    }
+    root.appendChild(banner);
+  }
+
+  // 2) Strip "Novidades deste refresh" — só destaca o que é novo E relevante (>= 7)
+  if (freshCount > 0) {
+    const relevantFresh = allNews
+      .filter(n => isFresh(n) && !state.dismissed.has(n.id) && n.nota >= 7)
+      .sort((a, b) => (b.nota - a.nota) || (ingestedAt(b) - ingestedAt(a)))
+      .slice(0, 8);
+
+    const strip = el('div', { class: 'fresh-strip' });
+    const headLabel = relevantFresh.length > 0
+      ? `Novidades deste refresh · ${freshCount}`
+      : `${freshCount} chegaram neste refresh · nenhuma com nota ≥ 7`;
+    const head = el('div', { class: 'fresh-head' },
+      el('h3', null, el('span', { class: 'new-dot' }), headLabel),
+      el('button', { class: 'ack', text: 'Marcar todas como vistas' })
+    );
+    head.querySelector('.ack').addEventListener('click', () => {
+      state.lastSeenAt = maxIngestedAt(allNews);
+      persistLastSeen();
+      renderToday();
+    });
+    strip.appendChild(head);
+
+    if (relevantFresh.length > 0) {
+      const list = el('div', { class: 'fresh-list' });
+      relevantFresh.forEach(n => {
+        const item = el('div', { class: 'fresh-item' });
+        item.appendChild(el('span', { class: `score ${scoreClass(n.nota)}`, text: Number(n.nota).toFixed(1) }));
+        const titleEl = el('div', { class: 'ftitle', text: n.titulo });
+        titleEl.addEventListener('click', () => {
+          const card = document.querySelector(`.card[data-id="${CSS.escape(n.id)}"]`);
+          if (card) { card.classList.add('expanded'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        });
+        item.appendChild(titleEl);
+        const metaStr = [n.fonte, n.data ? formatDateBR(n.data, { withYear: false }) : '', n.data ? relativeFromNow(n.data) : '']
+          .filter(Boolean).join(' · ');
+        item.appendChild(el('span', { class: 'fmeta', text: metaStr }));
+        list.appendChild(item);
+      });
+      strip.appendChild(list);
+    }
+    root.appendChild(strip);
+  }
+
+  // 3) Toolbar de filtros
+  root.appendChild(renderToolbar());
+
+  // 4) Pipeline de exibição: descarta dispensadas (a menos que showDismissed), aplica filtros
+  const baseList = state.showDismissed
+    ? allNews
+    : allNews.filter(n => !state.dismissed.has(n.id));
+  const filtered = applyFilters(baseList);
+
+  // 5) Resumo do que está sendo mostrado
+  const foco = filtered.filter(n => n.nota >= 9);
+  const consid = filtered.filter(n => n.nota >= 7 && n.nota < 9);
+  const ignore = filtered.filter(n => n.nota < 7);
+  const summary = el('div', { class: 'filter-summary' });
+  summary.append(
+    'Mostrando ', el('strong', { text: String(filtered.length) }),
+    ` de ${baseList.length} · `,
+    el('strong', { text: String(foco.length) }), ' p/ focar · ',
+    el('strong', { text: String(consid.length) }), ' a considerar · ',
+    el('strong', { text: String(ignore.length) }), ' p/ ignorar'
+  );
+  root.appendChild(summary);
+
+  if (filtered.length === 0) {
+    root.appendChild(el('div', { class: 'no-results' },
+      el('h3', { text: 'Nada bate com esses filtros' }),
+      el('p', { text: 'Tente alargar a janela temporal, mudar a fonte ou limpar a busca.' })
+    ));
+  }
+
+  // 6) Seções — Focar sempre aberta, Considerar/Ignorar colapsáveis
+  if (foco.length) {
+    root.appendChild(sectionHead('', 'Focar', ' hoje', 'nota 9+ · altamente aplicável'));
+    root.appendChild(cardsList(foco));
+  }
+  if (consid.length) {
+    appendCollapsibleSection(root, 'considera', 'Considerar', '', `nota 7–8.9 · ${consid.length} ${consid.length === 1 ? 'item' : 'itens'}`, cardsList(consid));
+  }
+  if (ignore.length) {
+    appendCollapsibleSection(root, 'ignore', 'Ignorar', ' por ora', `nota < 7 · ${ignore.length} ${ignore.length === 1 ? 'item' : 'itens'}`, cardsList(ignore, 'ignored'));
+  }
+
+  // 7) Barra de dispensadas (toggle no fim)
+  if (dismissedCount > 0) {
+    const bar = el('div', { class: 'dismissed-bar' });
+    bar.append(
+      el('span', { text: `${dismissedCount} ${dismissedCount === 1 ? 'novidade dispensada' : 'novidades dispensadas'}` }),
+      el('button', { text: state.showDismissed ? 'Ocultar dispensadas' : 'Mostrar dispensadas' })
+    );
+    bar.querySelector('button').addEventListener('click', () => {
+      state.showDismissed = !state.showDismissed;
+      renderToday();
+    });
+    root.appendChild(bar);
+  }
+}
+
+function appendCollapsibleSection(root, key, before, after, hint, content) {
+  const collapsed = state.collapsed[key] === true;
+  const head = sectionHead('', before, after, hint);
+  head.classList.add('collapsible');
+  if (collapsed) head.classList.add('collapsed');
+  // Chevron antes do título
+  const h2 = head.querySelector('h2');
+  h2.insertBefore(el('span', { class: 'chev-sec', text: '▾' }), h2.firstChild);
+  // Wrapper do conteúdo
+  const wrap = el('div', { class: 'section-body' + (collapsed ? ' hidden' : '') }, content);
+  head.addEventListener('click', () => {
+    state.collapsed[key] = !state.collapsed[key];
+    persistCollapsed();
+    head.classList.toggle('collapsed');
+    wrap.classList.toggle('hidden');
+  });
+  root.appendChild(head);
+  root.appendChild(wrap);
 }
 
 function renderFavorites() {
@@ -1111,6 +1639,17 @@ function wireCards() {
   document.querySelectorAll('[data-fav]').forEach(btn => {
     btn.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(btn.getAttribute('data-fav')); });
   });
+  document.querySelectorAll('[data-dismiss]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-dismiss');
+      if (state.dismissed.has(id)) state.dismissed.delete(id);
+      else state.dismissed.add(id);
+      persistDismissed();
+      renderToday();
+      updateCounts();
+    });
+  });
   document.querySelectorAll('[data-thumb]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1168,6 +1707,7 @@ async function tryLoadDemoData() {
 
 /* BOOT */
 (async () => {
+  loadClientState();
   await tryLoadDemoData();
   render();
   await tryRestore();
